@@ -1,0 +1,22 @@
+---
+# Hosts file parameters
+hosts_file: /etc/hosts
+hosts_file_create: true
+
+# Firewall parameters
+firewall_disable: true
+
+# Selinux paramters
+selinux_disable: true
+
+# Extend OS LVM
+extend_os_lvm: true
+
+# Data disks
+data_disk_filesystem: xfs
+data_disk_mount_options: noatime
+data_disk_mount_default_path: /mnt/data
+
+# User  parameters
+user_create: false
+user_hash_salt: "{{ lookup('community.general.random_string', length=16, min_lower=1, min_upper=1, special=false, min_numeric=1) }}"

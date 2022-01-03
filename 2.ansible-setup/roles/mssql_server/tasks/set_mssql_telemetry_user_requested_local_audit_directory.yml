@@ -1,0 +1,35 @@
+---
+- name: Check if the path exists
+  ansible.builtin.stat:
+    path: "{{ audit_directory }}"
+    get_md5: no
+  register: stat_audit_directory
+
+- name: Ensure the audit directory parameter is valid
+  assert:
+    that:
+    - stat_audit_directory.stat.exists
+    - stat_audit_directory.stat.isdir
+    fail_msg: "Audit directory '{{ audit_directory }}' does not appear valid "
+
+- name: Set the MSSQL server agent error log file
+  command: "{{ mssql_bin_path }}/mssql-conf set telemetry.userrequestedlocalauditdirectory {{ audit_directory }}"
+
+- name: Query the MSSQL server agent settings
+  command: "{{ mssql_bin_path }}/mssql-conf get telemetry"
+  register: result
+
+# The search function does not let us build the string in the function bracket, for
+# some unknown and mysterious reason. So we build the query string here and use it
+# and the function is happy.
+- name: Build query
+  set_fact:
+    query_string: "userrequestedlocalauditdirectory : {{ audit_directory }}"
+
+- name: "Ensure the MSSQL user requested local audit directory is set to {{ audit_directory }}"
+  assert:
+    that:
+      - result.rc == 0
+      - result.stdout is search("{{ query_string }}")
+    fail_msg: "Agent error log file is not set correctly {{ result.stdout }}"
+    success_msg: "Agent error log file is set to {{ audit_directory }}"

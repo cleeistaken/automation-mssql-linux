@@ -1,0 +1,46 @@
+---
+- name: Read device information (always use unit when probing)
+  parted: device=/dev/sda unit=KiB
+  register: sda_info
+
+- debug:
+    var: sda_info
+
+- name: Extend LVM partition
+  command: " /usr/sbin/parted -s -m -a optimal /dev/sda -- unit KiB resizepart 3 100%"
+
+- name: resize physical volume
+  command: "pvresize /dev/sda3"
+  register: lvm_pvresize_output
+  tags:
+    - lvm
+    - resizefs
+
+- name: get free space in vg
+  shell: "vgdisplay | grep Free | cut -d '/' -f 3 | cut -d ' ' -f 2 | tr -d '[:space:]'"
+  register: vgdisplay_output
+
+- set_fact:
+    vg_free: "{{ vgdisplay_output.stdout_lines[0] }}"
+
+-  name: get volume group name
+   shell: "vgdisplay | grep 'VG Name' | cut -c 10- | tr -d '[:space:]'"
+   register: vgdisplay_output
+
+- set_fact:
+    vg_name: "{{ vgdisplay_output.stdout_lines[0] }}"
+
+- debug:
+    var: vg_free
+
+- debug:
+    var: vg_name
+
+- name: Extend the logical volume to take all remaining space of the PVs and resize the underlying filesystem
+  lvol:
+    vg: "{{ vg_name }}"
+    lv: root
+    size: +100%FREE
+    resizefs: true
+  when: vg_free|int > 0
+

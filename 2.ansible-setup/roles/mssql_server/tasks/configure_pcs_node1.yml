@@ -1,0 +1,121 @@
+---
+- name: Set distribution
+  set_fact:
+    is_centos: "{{ ansible_distribution == 'CentOS' }}"
+    is_debian: "{{ ansible_distribution == 'Debian' }}"
+    is_redhat: "{{ ansible_distribution == 'RedHat' }}"
+    is_ubuntu: "{{ ansible_distribution == 'Ubuntu' }}"
+
+- name: Get list of nodes
+  set_fact:
+    pcs_fqdn="{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'ansible_fqdn') |list }}"
+    pcs_uuid="{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'uuid') }}"
+    pcs_addr="{{ groups['mssql_linux_vm'] | map('extract', hostvars, ['ansible_default_ipv4', 'address'])  }}"
+
+- name: Build fqdn to uuid list
+  set_fact:
+    pcs_mappings="{{ pcs_mappings | default([])  }} + [ '{{ item[0] }}:{{ item[1] }}' ]"
+  loop: "{{ pcs_fqdn | zip(pcs_uuid) | list }}"
+
+- name: Build fqdn addr string
+  set_fact:
+    pcs_host_addrs="{{ pcs_host_addrs | default([])  }} + [ '{{ item[0] }} addr={{ item[1] }}' ]"
+  loop: "{{ pcs_fqdn | zip(pcs_addr) | list }}"
+
+- name: Build mapping string
+  set_fact:
+    pcs_mapping_string="{{ pcs_mappings | join(';') }}"
+
+- name: Print host:uuid mappings
+  debug:
+    var: pcs_mapping_string
+
+- name: Build fqdn addr string
+  set_fact:
+    pcs_host_addr_string="{{ pcs_host_addrs | join(' ') }}"
+
+- name: Print fqdn addr string
+  debug:
+    var: pcs_host_addr_string
+
+- name: Authenticate pcs nodes
+  ansible.builtin.command: "pcs host -u hacluster -p {{ HACLUSTER_PASSWORD }} auth {{ pcs_fqdn | join(' ') }}"
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result.stdout
+
+- name: Get PCS cluster status
+  ansible.builtin.command: "pcs cluster status"
+  register: result
+  failed_when: result.rc not in [ 0, 1 ]
+
+- name: Cluster running?
+  set_fact:
+    cluster_running: "{{ not ('Error: cluster is not currently running on this node' in [result.stdout, result.stderr]) }}"
+
+- name: Output
+  ansible.builtin.debug:
+    var: cluster_running
+
+- name: Create and start cluster
+  ansible.builtin.command: "pcs cluster setup {{ PCS_CLUSTER_NAME | default(default_pcs_cluster_name) }} {{ pcs_host_addr_string }} --start --force"
+  register: result
+  when: not cluster_running
+
+- name: Output
+  ansible.builtin.debug:
+    var: result.stdout
+
+- name: Enable the cluster to start automatically at boot
+  ansible.builtin.command: "pcs cluster enable --all"
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result.stdout
+
+- name: Set pcs property stonith-enabled to false
+  ansible.builtin.command: "pcs property set stonith-enabled=false"
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result.stdout
+
+- name: Set pcs property no-quorum-policy to ignore
+  ansible.builtin.command: "pcs property set no-quorum-policy=ignore"
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result.stdout
+
+- name: Wait for PCS cluster to start
+  pause:
+    seconds: 15
+
+- name: Get cluster status
+  ansible.builtin.command: "pcs cluster status"
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result.stdout
+
+- name: Create cluster VIP
+  ansible.builtin.command: "pcs resource create clusterip ocf:heartbeat:IPaddr2 ip={{ PCS_CLUSTER_VIP_CIDR | ansible.netcommon.ipaddr('address') }} cidr_netmask={{ PCS_CLUSTER_VIP_CIDR | ansible.netcommon.ipaddr('prefix') }} op monitor interval=30s"
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result.stdout
+
+- name: Configure resource stickiness
+  ansible.builtin.command: "pcs resource defaults resource-stickiness=100"
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result.stdout

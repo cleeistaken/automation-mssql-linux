@@ -1,0 +1,17 @@
+---
+- name: Restart MSSQL Server
+  ansible.builtin.service:
+    name: mssql-server
+    state: restarted
+
+- name: Query MSSQL Server service journal
+  command: "journalctl -u mssql-server.service -b"
+  register: result
+
+- name: Check for MSSQL Server startup errors
+  assert:
+    that:
+      - result.rc == 0
+      - result.stdout is not search('-- No entries --')
+    fail_msg: "Journal contains entries. Please connect to host and run 'journalctl -u mssql-server.service -b' for details"
+    success_msg: "Journal did not contain entries"

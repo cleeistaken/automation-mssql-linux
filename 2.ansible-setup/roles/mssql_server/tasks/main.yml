@@ -1,0 +1,28 @@
+---
+- name: Install MSSQL Server CentOS
+  import_tasks: install_mssql_server_centos.yml
+  when: ansible_distribution == 'CentOS'
+
+- name: Install MSSQL Server Ubuntu
+  import_tasks: install_mssql_server_ubuntu.yml
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Configure MSSQL Server
+  import_tasks: configure_mssql.yml
+
+- name: Install MSSQL HA Centos
+  import_tasks: install_mssql_ha_centos.yml
+  when: SQL_INSTALL_HA_Pace|upper == 'Y' and ansible_distribution == 'CentOS'
+
+- name: Install MSSQL HA Ubuntu
+  import_tasks: install_mssql_ha_ubuntu.yml
+  when: SQL_INSTALL_HA_Pace|upper == 'Y' and ansible_distribution == 'Ubuntu'
+
+- name: Configure PCS primary node
+  import_tasks: configure_pcs_node1.yml
+  when: (SQL_INSTALL_HA_Pace|upper == 'Y') and (inventory_hostname == play_hosts[0])
+
+- name: Configure PCS all nodes
+  import_tasks: configure_pcs_all.yml
+  when: (SQL_INSTALL_HA_Pace|upper == 'Y')
+

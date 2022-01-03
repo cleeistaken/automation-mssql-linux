@@ -1,0 +1,6 @@
+---
+- name: Auto-Fail
+  assert:
+    that:
+      - false
+    msg: To-Do

@@ -1,0 +1,40 @@
+---
+- name: delete current repo
+  yum_repository:
+    name: "{{ item | lower }}"
+    file: "CentOS-Linux-{{ item }}"
+    state: absent
+  loop:
+    - AppStream
+    - BaseOS
+    - ContinuousRelease
+    - Debuginfo
+    - Devel
+    - Extras
+    - FastTrack
+    - HighAvailability
+    - Media
+    - Plus
+    - PowerTools
+    - Sources
+  notify: yum_clean_metadata
+
+- name: add current host as baseos repo
+  yum_repository:
+    name: baseos
+    description: Centos 8 BaseOS Repo
+    file: CentOS-Linux-BaseOS
+    baseurl: "http://{{ repo_ip }}/$contentdir/$releasever/BaseOS/$basearch/os/"
+    gpgcheck: yes
+    gpgcakey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+    enabled: yes
+
+- name: add current host as appstream repo
+  yum_repository:
+    name: appstream
+    description: Centos 8 AppStream Repo
+    file: CentOS-Linux-AppStream
+    baseurl: "http://{{ repo_ip }}/$contentdir/$releasever/AppStream/$basearch/os/"
+    gpgcheck: yes
+    gpgcakey: file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+    enabled: yes

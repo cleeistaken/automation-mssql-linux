@@ -1,0 +1,69 @@
+---
+- name: Gather hardware facts
+  setup:
+    gather_subset:
+      - hardware
+
+- name: Get disks (/dev/sd*) except sda (OS)
+  set_fact:
+    disks: "{{ disks|default([]) + [ '/dev/' ~ item ] }}"
+  loop: "{{ hostvars[inventory_hostname].ansible_devices.keys() | map('regex_search', 'sd([b-z]+|[a-z]{2})') | select('string') | list | sort }}"
+
+- name: List disks
+  debug:
+    var: disks
+
+- name: Validate sufficent paths specified
+  assert:
+    that: disks|length <= vars.data_disk_mount_paths|length
+    fail_msg: "There are {{ disks|length }} data disks but {{ vars.data_disk_mount_paths|length }} mount points specified in 'data_disk_mount_paths'"
+  when: data_disk_mount_paths is defined
+
+- name: Get currently mounted devices
+  set_fact:
+    mounted_devices: "{{ ansible_mounts|json_query('[].device') }}"
+
+- name: List mounted devices
+  debug:
+    var: mounted_devices
+
+- name: Partition disks
+  parted:
+    device: "{{ item }}"
+    number: 1
+    state: present
+  when: vars.disks is defined and item not in mounted_devices
+  loop: "{{ vars.disks }}"
+
+- name: Create filesystem
+  filesystem:
+    fstype: "{{ vars.data_disk_filesystem }}"
+    dev: "{{ item }}1"
+  when: vars.disks is defined and item not in mounted_devices
+  loop: "{{ vars.disks }}"
+  loop_control:
+    index_var: my_index
+
+- name: Mount data volumes using default paths
+  mount:
+    src: "{{ item }}1"
+    path: "{{  data_disk_mount_default_path }}{{ my_index }}"
+    opts: "{{ vars.data_disk_mount_options }}"
+    state: mounted
+    fstype: "{{ vars.data_disk_filesystem }}"
+  when: (vars.disks is defined and item not in mounted_devices) and data_disk_mount_paths is not defined
+  loop: "{{ vars.disks }}"
+  loop_control:
+    index_var: my_index
+
+- name: Mount data volumes using specified mount points
+  mount:
+    src: "{{ item }}1"
+    path: "{{  data_disk_mount_paths[my_index] }}"
+    opts: "{{ vars.data_disk_mount_options }}"
+    state: mounted
+    fstype: "{{ vars.data_disk_filesystem }}"
+  when: (vars.disks is defined and item not in mounted_devices) and data_disk_mount_paths is defined
+  loop: "{{ vars.disks }}"
+  loop_control:
+    index_var: my_index

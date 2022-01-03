@@ -1,0 +1,98 @@
+---
+- name: Generate folders and error log file names
+  set_fact:
+    filename_errorlog: "{{ ((MSSQL_DIRECTORY_ERRORLOGS | default(default_mssql_directory_errorlogs)), (MSSQL_ERROR_LOG_FILENAME|default(default_mssql_error_log_filename))) | path_join }}"
+    directory_data: "{{ MSSQL_DIRECTORY_DATA | default(default_mssql_directory_data) }}"
+    directory_log: "{{ MSSQL_DIRECTORY_LOG | default(default_mssql_directory_log) }}"
+    directory_backup: "{{ MSSQL_DIRECTORY_BACKUP | default(default_mssql_directory_backup) }}"
+    directory_dump:  "{{ MSSQL_DIRECTORY_DUMP | default(default_mssql_directory_dump) }}"
+    directory_audit: "{{ MSSQL_DIRECTORY_AUDIT | default(default_mssql_directory_audit) }}"
+    directory_error: "{{ MSSQL_DIRECTORY_ERRORLOGS | default(default_mssql_directory_errorlogs) }}"
+
+- name: Generate directory and settings lists
+  set_fact:
+    mssql_directories:
+      - "{{ directory_data }}"
+      - "{{ directory_log }}"
+      - "{{ directory_backup }}"
+      - "{{ directory_dump }}"
+      - "{{ directory_audit }}"
+      - "{{ directory_error }}"
+    mssql_directory_settings: [
+      {
+        setting: 'filelocation.defaultdatadir',
+        value: "{{ directory_data }}"
+      },
+      {
+        setting: 'filelocation.defaultlogdir',
+        value: "{{ directory_log }}"
+      },
+      {
+        setting: 'filelocation.defaultbackupdir',
+        value: "{{ directory_backup }}"
+      },
+      {
+        setting: 'filelocation.defaultdumpdir',
+        value: "{{ directory_dump }}"
+      },
+      {
+        setting: 'filelocation.errorlogfile',
+          value: "{{ filename_errorlog }}"
+      }
+    ]
+
+- name: Create MSSQL server directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "{{ MSSQL_DIRECTORY_USER | default(default_mssql_directory_user) }}"
+    group: "{{ MSSQL_DIRECTORY_GROUP | default(default_mssql_directory_group) }}"
+    mode: "{{ MSSQL_DIRECTORY_MODE | default(default_mssql_directory_mode) }}"
+    state: directory
+    recurse: yes
+  loop: "{{ mssql_directories }}"
+
+- name: Set the MSSQL server directory settings
+  command: "{{ mssql_bin_path }}/mssql-conf set {{ item.setting }} {{ item.value }}"
+  loop: "{{ mssql_directory_settings }}"
+
+- name: Enable MSSQL HADR
+  include_tasks:
+    file: enable_mssql_hadr.yml
+
+- name: Enable the SQL Server Agent
+  include_tasks:
+    file: enable_mssql_agent.yml
+
+- name: Set the MSSQL Agent logging level
+  include_tasks:
+    file: set_mssql_agent_loging_level.yml
+  vars:
+    logging_level: "{{ SQL_AGENT_ERROR_LOGGING_LEVEL | default(default_sql_agent_logging_level) }}"
+
+- name: Set the MSSQL Agent error log file
+  include_tasks:
+    file: set_mssql_agent_errorlogfile.yml
+  vars:
+    error_log_file: "{{ SQL_AGENT_ERROR_LOG_FILE }}"
+
+- name: Set the MSSQL telemetry customer feedback
+  include_tasks:
+    file: set_mssql_telemetry_customer_feedback.yml
+  vars:
+    feedback_enabled: "{{ SQL_TELEMETRY_CUSTOMER_FEEDBACK|bool }}"
+
+- name: Set the MSSQL telemetry user requested audit directory
+  include_tasks:
+    file: set_mssql_telemetry_user_requested_local_audit_directory.yml
+  vars:
+    audit_directory: "{{ SQL_TELEMETRY_USER_REQUESTED_LOCAL_AUDIT_DIRECTORY }}"
+
+- name: Set the MSSQL coredump type
+  include_tasks:
+    file: set_mssql_coredump_type.yml
+  vars:
+    coredump_type: "{{ SQL_COREDUMP_TYPE | default(default_sql_coredump_type) }}"
+
+- name: Restart MSSQL Server
+  include_tasks:
+    file: restart_mssql_server.yml
