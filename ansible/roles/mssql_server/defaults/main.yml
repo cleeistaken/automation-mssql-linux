@@ -1,0 +1,42 @@
+---
+mssql_bin_path: /opt/mssql/bin
+mssql_tools_bin_path: /opt/mssql-tools/bin
+
+default_mssql_port: 1433
+
+default_mssql_directory_data: /sqlnux/data
+default_mssql_directory_log: /sqlnux/log
+default_mssql_directory_backup: /sqlnux/backup
+default_mssql_directory_dump: /sqlnux/dump
+default_mssql_directory_audit: /sqlnux/audit
+default_mssql_directory_errorlogs: /sqlnux/errorlogs
+
+default_sql_agent_error_log_file: /sqlnux/errorlogs
+default_sql_telemetry_customer_feedback: false
+
+default_sql_telemetry_user_requested_local_audit_directory: /sqlnux/audit
+
+default_mssql_directory_user: mssql
+default_mssql_directory_group: mssql
+default_mssql_directory_mode: '0755'
+
+default_mssql_error_log_filename: 'errorlog'
+
+default_sql_coredump_type: 'full'
+
+default_sql_agent_logging_level: 7
+
+default_pcs_cluster_name: 'sqnux-clus01'
+
+default_mssql_cert_folder: /var/opt/mssql/data
+
+default_mssql_listener_port: 5022
+default_mssql_endpoint: hadr_endpoint
+
+default_pcs_fence_name: vmwsqnux-fence
+
+default_mssql_trace_flags:
+  - 1204
+  - 1222
+
+default_pcs_resource_vip_name: virtualip1

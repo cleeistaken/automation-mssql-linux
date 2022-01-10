@@ -1,0 +1,12 @@
+---
+- name: Stop and disable firewalld
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: false
+  when: is_centos or is_redhat
+
+- name: Stop and disable ufw
+  community.general.ufw:
+    state: disabled
+  when: is_debian or is_ubuntu

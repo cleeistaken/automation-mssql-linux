@@ -1,0 +1,39 @@
+---
+- name: Wait for systems to boot up
+  hosts: all
+  gather_facts: no
+  any_errors_fatal: true
+  tasks:
+    - name: Wait up to 600 seconds
+      wait_for_connection:
+        delay: 3
+        sleep: 5
+        timeout: 600
+
+- name: Get IP
+  hosts: localhost
+  tasks:
+    - set_fact:
+        repo_ip: "{{ ansible_default_ipv4.address }}"
+
+#- name: Repo Configuration
+#  hosts: all
+#  any_errors_fatal: true
+#  vars:
+#    repo_ip: "{{ hostvars['localhost']['repo_ip'] }}"
+#  roles:
+#    - role: repo
+#      when: vars.local_repo|bool == true#
+
+- name: Common Configuration
+  hosts: all
+  any_errors_fatal: true
+  roles:
+    - role: common
+
+- name: Install MSSQL
+  hosts: all
+  any_errors_fatal: true
+  roles:
+    - role: mssql_server
+

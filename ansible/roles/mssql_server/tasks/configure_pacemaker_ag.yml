@@ -1,0 +1,118 @@
+---
+#
+# https://www.mssqltips.com/sqlservertip/5406/install-and-configure-sql-server-2017-availability-groups-on-linux-part-4/
+#
+# Create Parameters
+#
+- name: Create host parameters
+  set_fact:
+    pcs_fqdn: "{{ pcs_fqdn | default([]) + [ item.0 ]}}"
+    pcs_mappings: "{{ pcs_mappings | default([]) + [ item.0 + ':' + item.1 ]}}"
+    pcs_host_addrs: "{{ pcs_host_addrs | default([]) + [ item.0 + ' addr=' + item.2 ]}}"
+  with_together:
+    - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'ansible_fqdn') }}"
+    - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'uuid') }}"
+    - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, ['ansible_default_ipv4', 'address'])  }}"
+
+#
+# Create AG Resource
+#
+- name: Create pcs ag cluster name
+  set_fact:
+    ag_cluster: "{{ MSSQL_AG_NAME }}_cluster"
+
+- name: Create AG cluster resource
+  ansible.builtin.command: >
+    pcs resource create {{ ag_cluster }} ocf:mssql:ag ag_name={{ MSSQL_AG_NAME }} meta failure-timeout=30s --master meta notify=true
+
+- name: Output
+  ansible.builtin.debug:
+    var: result
+
+- name: Add pcs constraint colocation
+  ansible.builtin.command:  >
+    pcs constraint colocation add {{ PCS_RESOURCE_VIP_NAME | default(default_pcs_resource_vip_name) }} with master {{ ag_cluster }}-clone INFINITY
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result
+
+- name: Add pcs constraint ordering
+  ansible.builtin.command: >
+    pcs constraint order promote {{ ag_cluster }}-clone then start {{ PCS_RESOURCE_VIP_NAME | default(default_pcs_resource_vip_name) }}
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result
+
+- name: Add pcs constraint location preference
+  ansible.builtin.command: >
+    pcs constraint location {{ ag_cluster }}-clone prefers {{ ansible_fqdn }}
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result
+
+#
+# PCS Resource Cleanup
+#
+- name: "Run pcs resource cleanup on {{ MSSQL_AG_NAME }}"
+  ansible.builtin.command: >
+    pcs resource cleanup {{ ag_cluster }}
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result
+
+
+#
+# Stonith Configuration
+#
+- name: Create fence using fence_vmware_soap
+  ansible.builtin.command: >
+    pcs stonith create {{ PCS_FENCE_NAME | default(default_pcs_fence_name) }} 
+    fence_vmware_soap pcmk_host_map="{{ pcs_mappings | join(';')   }}" 
+    ipaddr={{ vars.vcenter.host }} 
+    ssl=1 
+    ipport=443 
+    ssl_insecure=1 
+    inet4_only=1 
+    login={{ vars.vcenter.username }} 
+    passwd={{ vars.vcenter.password }}
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result
+
+- name: Set pcs property stonith-enabled to true
+  ansible.builtin.command: >
+    pcs property set stonith-enabled=true
+  register: result
+
+- name: Output
+  debug:
+    var: result.stdout
+
+- name: Set cluster recheck interval
+  ansible.builtin.command: >
+    pcs property set cluster-recheck-interval=2min
+  register: result
+
+- name: Output
+  debug:
+    var: result.stdout
+
+- name: Set start failure is fatal
+  ansible.builtin.command: >
+    pcs property set start-failure-is-fatal=true
+  register: result
+
+- name: Output
+  debug:
+    var: result.stdout
+

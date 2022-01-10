@@ -1,0 +1,41 @@
+---
+- name: Validate username and password are defined
+  assert:
+    that: user_username is defined and user_password is defined
+    fail_msg: "Both 'user_username' and 'user_password' must be defined"
+
+- name: Validate username is not empty
+  assert:
+    that: user_username|length >= 3
+    fail_msg: "'user_username' must not be empty and and least 3 characters"
+
+- name: Validate password is not empty
+  assert:
+    that: user_password|length >= 6
+    fail_msg: "'user_password' must not be empty and and least 6 characters"
+
+- name: Set OS options CentOS
+  set_fact:
+    shell_path: /usr/bin/bash
+    sudo_group: wheel
+  when: is_centos
+
+- name: Set OS options Ubuntu
+  set_fact:
+    shell_path: /usr/bin/bash
+    sudo_group: sudo
+  when: is_ubuntu
+
+- name: "Create user {{ vars.user_username }}"
+  user:
+    name: "{{ vars.user_username }}"
+    password: "{{ vars.user_password | password_hash('sha512', user_hash_salt) }}"
+    shell: "{{ shell_path }}"
+    groups: "{{ sudo_group }}"
+    append: yes
+
+- name: Set authorized key taken from file
+  ansible.posix.authorized_key:
+    user: "{{ vars.user_username }}"
+    state: present
+    key: "{{ lookup('file', vars.vm_ssh_key_file) }}"

@@ -1,0 +1,77 @@
+---
+#
+# Install Pacemaker, PCS. Fence Agents and Resource Agents
+#
+# re: apt upgrade full raises a "Could not get lock /var/lib/dpkg/lock-frontend"
+# https://github.com/ansible/ansible/issues/51663
+- name: Install pacemaker and pcs
+  ansible.builtin.apt:
+    name:
+      - pacemaker
+      - pcs
+      - fence-agents
+      - resource-agents
+    state: present
+  register: apt_action
+  delay: 5
+  retries: 60
+  until: apt_action is success or ('Failed to lock apt for exclusive operation' not in apt_action.msg and '/var/lib/dpkg/lock' not in apt_action.msg)
+
+- name: Start and enable pcsd service
+  ansible.builtin.service:
+    name: pcsd
+    state: started
+    enabled: yes
+
+- name: Stop default cluster
+  ansible.builtin.command: "pcs cluster stop --force"
+  register: result
+
+- name: Destroy default cluster
+  ansible.builtin.command: "pcs cluster destroy"
+  register: result
+
+- name: Set user hacluster user password
+  user:
+    name: hacluster
+    password: "{{ HACLUSTER_PASSWORD | password_hash('sha512') }}"
+
+#
+# Create Pacemaker User
+#
+# https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-create-availability-group?view=sql-server-ver15
+- name: "Create MSSQL user {{ SQL_Pace_USER }} for Pacemaker"
+  ansible.builtin.command: >
+    {{ mssql_tools_bin_path }}/sqlcmd 
+    -s localhost 
+    -U SA 
+    -P "{{ MSSQL_SA_PASSWORD }}"
+    -Q "IF NOT EXISTS (SELECT name FROM master.sys.server_principals WHERE name = '{{ SQL_Pace_USER }}') BEGIN CREATE LOGIN [{{ SQL_Pace_USER }}] with PASSWORD = N'{{ SQL_Pace_USER_PASSWORD }}' END; ALTER SERVER ROLE [sysadmin] ADD MEMBER [{{ SQL_Pace_USER }}];"
+  register: result
+
+- name: Print command output
+  ansible.builtin.debug:
+    var: result.stdout
+
+- name: "Grant permissions to user {{ SQL_Pace_USER }} on Availability Group {{ MSSQL_AG_NAME }}"
+  ansible.builtin.command: >
+    {{ mssql_tools_bin_path }}/sqlcmd 
+    -s localhost 
+    -U SA 
+    -P "{{ MSSQL_SA_PASSWORD }}"
+    -Q "GRANT ALTER, CONTROL, VIEW DEFINITION ON AVAILABILITY GROUP::{{ MSSQL_AG_NAME }} TO {{ SQL_Pace_USER }}; GRANT VIEW SERVER STATE TO {{ SQL_Pace_USER }};"
+  register: result
+
+- name: Print command output
+  ansible.builtin.debug:
+    var: result.stdout
+
+- name: Save credentials for pacemaker login
+  copy:
+    dest: /var/opt/mssql/secrets/passwd
+    mode: 400
+    owner: root
+    group: root
+    content: |
+      {{ SQL_Pace_USER }}
+      {{ SQL_Pace_USER_PASSWORD }}

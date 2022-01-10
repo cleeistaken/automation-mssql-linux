@@ -1,0 +1,94 @@
+---
+all:
+  vars:
+    # Host packages
+    upgrade_all_packages: yes
+
+    # Hosts file
+    hosts_file_create: true
+
+    # Firewall
+    firewall_disable: true
+
+    # SELinux
+    selinux_disable: true
+
+    # Disks
+    extend_os_lvm: true
+    mount_data_disks: true
+    data_disk_mount_paths: [ '/sqlnux' ]
+
+    # User
+    user_create: true
+    user_username: 'vmware'
+    user_password: 'VMware1!'
+
+    #
+    # MSSQL Server
+    # https://dba.stackexchange.com/questions/216955/listing-the-microsoft-sql-server-configuration-with-the-values-set-by-mssql-conf
+
+    MSSQL_PORT: 1433
+
+    # MSSQL server directories
+    MSSQL_DIRECTORY_DATA: '/sqlnux/data'
+    MSSQL_DIRECTORY_LOG: '/sqlnux/log'
+    MSSQL_DIRECTORY_BACKUP: '/sqlnux/backup'
+    MSSQL_DIRECTORY_DUMP: '/sqlnux/dump'
+    MSSQL_DIRECTORY_AUDIT: '/sqlnux/audit'
+    MSSQL_DIRECTORY_ERRORLOGS: '/sqlnux/errorlogs'
+
+    # Directory owner, group, and permissions
+    #MSSQL_DIRECTORY_USER: mssql
+    #MSSQL_DIRECTORY_GROUP: mssql
+    #MSSQL_DIRECTORY_MODE: '0755''
+
+    # Error logfile name
+    #MSSQL_ERROR_LOG_FILENAME: 'errorlog'
+
+    # Core dump type to capture
+    # values: mini, miniplus, filtered, full
+    #SQL_COREDUMP_TYPE: 'full'
+
+    SQL_INSTALL_AGENT: N
+
+    SQL_AGENT_ENABLE: true
+    SQL_AGENT_ERROR_LOG_FILE: /sqlnux/errorlogs
+
+    SQL_TELEMETRY_CUSTOMER_FEEDBACK: false
+    SQL_TELEMETRY_USER_REQUESTED_LOCAL_AUDIT_DIRECTORY: /sqlnux/audit
+
+
+    # SQL Agent logging levels are bitmask values that equal:
+    #    1 = Errors
+    #    2 = Warnings
+    #    4 = Info
+    # If you want to capture all levels, use 7 as the value.
+    SQL_AGENT_ERROR_LOGGING_LEVEL: 7
+
+    SQL_INSTALL_HA: Y
+    SQL_INSTALL_FULLTEXT: Y
+    SQL_INSTALL_INTG_SVC: N
+    SQL_INSTALL_EXT: Y
+    SQL_INSTALL_HA_Pace: Y
+    SQL_INSTALL_USER: dejisqlnux
+    SQL_INSTALL_USER_PASSWORD: cashc0wBunG@!
+    SQL_Pace_USER: pacesqlnux
+    SQL_Pace_USER_PASSWORD: cashc0wBunG@!
+    ACCEPT_EULA: Y
+    MSSQL_SA_PASSWORD: cashc0wBunG@!
+    MSSQL_PID: enterprise
+    HACLUSTER_PASSWORD: P@ssw0rd
+
+    # https://docs.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-traceon-trace-flags-transact-sql?view=sql-server-ver15
+    MSSQL_TRACE_FLAGS:
+      - 1204
+      - 1222
+
+    PCS_CLUSTER_VIP_CIDR: '172.16.20.221/23'
+
+    MSSQL_AG_NAME: 'ag1'
+
+    MSSQL_AG_DB_NAME: 'db1'
+
+    PCS_FENCE_NAME: vmw_sql_fence
+    PCS_RESOURCE_VIP_NAME: virtualip1

@@ -1,0 +1,156 @@
+---
+- name: Add Microsoft keys to apt
+  ansible.builtin.apt_key:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+
+# https://packages.microsoft.com/config/ubuntu/20.04/mssql-server-2019.list
+# 20.04 deb [arch=amd64,armhf,arm64] https://packages.microsoft.com/ubuntu/20.04/mssql-server-2019 focal main
+# 18.04 deb [arch=amd64,arm64,armhf] https://packages.microsoft.com/ubuntu/18.04/mssql-server-2019 bionic main
+# 16.04 deb [arch=amd64,arm64,armhf] https://packages.microsoft.com/ubuntu/16.04/mssql-server-2019 xenial main
+- name: Add Microsoft Prod repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64,armhf,arm64] https://packages.microsoft.com/ubuntu/{{ ansible_distribution_version }}/prod {{ ansible_distribution_release }} main"
+    state: present
+    update_cache: yes
+
+# https://packages.microsoft.com/config/ubuntu/20.04/mssql-server-2019.list
+# 20.04 deb [arch=amd64,armhf,arm64] https://packages.microsoft.com/ubuntu/20.04/mssql-server-2019 focal main
+# 18.04 deb [arch=amd64,arm64,armhf] https://packages.microsoft.com/ubuntu/18.04/mssql-server-2019 bionic main
+# 16.04 deb [arch=amd64,arm64,armhf] https://packages.microsoft.com/ubuntu/16.04/mssql-server-2019 xenial main
+- name: Add Microsoft SQL Server repository
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64,armhf,arm64] https://packages.microsoft.com/ubuntu/{{ ansible_distribution_version }}/mssql-server-2019 {{ ansible_distribution_release }} main"
+    state: present
+    update_cache: yes
+
+# re: apt upgrade full raises a "Could not get lock /var/lib/dpkg/lock-frontend"
+# https://github.com/ansible/ansible/issues/51663
+- name: Install MSSQL Server
+  ansible.builtin.apt:
+    name:
+      - mssql-server
+    state: present
+  register: apt_action
+  delay: 5
+  retries: 60
+  until: apt_action is success or ('Failed to lock apt for exclusive operation' not in apt_action.msg and '/var/lib/dpkg/lock' not in apt_action.msg)
+
+- name: Stop MSSQL Server
+  ansible.builtin.service:
+    name: mssql-server
+    state: stopped
+
+- name: Accept MSSQL EULA
+  ansible.builtin.command: "{{ mssql_bin_path }}/mssql-conf -n setup accept-eula"
+  environment:
+    MSSQL_SA_PASSWORD: "{{ vars.MSSQL_SA_PASSWORD }}"
+    MSSQL_PID: "{{ vars.MSSQL_PID }}"
+
+- name: Start and enable MSSQL Server
+  ansible.builtin.service:
+    name: mssql-server
+    state: started
+    enabled: yes
+
+# https://github.com/mikecali/mssql2019-roles-RHEL8/blob/main/site.yaml
+- name: Wait up to 60 seconds for server to become available after creation
+  wait_for:
+    port: 1433
+    timeout: 60
+
+# re: apt upgrade full raises a "Could not get lock /var/lib/dpkg/lock-frontend"
+# https://github.com/ansible/ansible/issues/51663
+- name: Install MSSQL tools and ODBC
+  ansible.builtin.apt:
+    name:
+      - mssql-tools
+      - unixodbc-dev
+    state: present
+  register: apt_action
+  delay: 5
+  retries: 60
+  until: apt_action is success or ('Failed to lock apt for exclusive operation' not in apt_action.msg and '/var/lib/dpkg/lock' not in apt_action.msg)
+  environment:
+    ACCEPT_EULA: "{{ vars.ACCEPT_EULA }}"
+
+- name: "Add {{ mssql_bin_path }} to path"
+  ansible.builtin.lineinfile: >
+    dest=/etc/environment
+    state=present
+    backrefs=yes
+    regexp='PATH=(["]*)((?!.*?{{mssql_bin_path}}).*?)(["]*)$'
+    line="PATH=\1\2:{{mssql_bin_path}}\3"
+
+- name: "Add {{ mssql_tools_bin_path }} to path"
+  ansible.builtin.lineinfile: >
+    dest=/etc/environment
+    state=present
+    backrefs=yes
+    regexp='PATH=(["]*)((?!.*?{{mssql_tools_bin_path}}).*?)(["]*)$'
+    line="PATH=\1\2:{{mssql_tools_bin_path}}\3"
+
+# re: apt upgrade full raises a "Could not get lock /var/lib/dpkg/lock-frontend"
+# https://github.com/ansible/ansible/issues/51663
+- name: Install MSSQL Agent
+  ansible.builtin.apt:
+    name:
+      - mssql-server-agent
+    state: present
+  register: apt_action
+  delay: 5
+  retries: 60
+  until: apt_action is success or ('Failed to lock apt for exclusive operation' not in apt_action.msg and '/var/lib/dpkg/lock' not in apt_action.msg)
+  when: vars.SQL_INSTALL_AGENT|upper == 'Y'
+
+# re: apt upgrade full raises a "Could not get lock /var/lib/dpkg/lock-frontend"
+# https://github.com/ansible/ansible/issues/51663
+- name: Install MSSQL HA
+  ansible.builtin.apt:
+    name:
+      - mssql-server-ha
+    state: present
+  register: apt_action
+  delay: 5
+  retries: 60
+  until: apt_action is success or ('Failed to lock apt for exclusive operation' not in apt_action.msg and '/var/lib/dpkg/lock' not in apt_action.msg)
+  when: vars.SQL_INSTALL_HA|upper == 'Y'
+
+# re: apt upgrade full raises a "Could not get lock /var/lib/dpkg/lock-frontend"
+# https://github.com/ansible/ansible/issues/51663
+- name: Install MSSQL Full Text Search
+  ansible.builtin.apt:
+    name:
+      - mssql-server-fts
+    state: present
+  register: apt_action
+  delay: 5
+  retries: 60
+  until: apt_action is success or ('Failed to lock apt for exclusive operation' not in apt_action.msg and '/var/lib/dpkg/lock' not in apt_action.msg)
+  when: vars.SQL_INSTALL_FULLTEXT|upper == 'Y'
+
+# re: apt upgrade full raises a "Could not get lock /var/lib/dpkg/lock-frontend"
+# https://github.com/ansible/ansible/issues/51663
+- name: Install MSSQL Integration Service
+  ansible.builtin.apt:
+    name:
+      - mssql-server-is
+    state: present
+  register: apt_action
+  delay: 5
+  retries: 60
+  until: apt_action is success or ('Failed to lock apt for exclusive operation' not in apt_action.msg and '/var/lib/dpkg/lock' not in apt_action.msg)
+  when: vars.SQL_INSTALL_INTG_SVC|upper == 'Y'
+
+- name: Restart the MSSQL Server
+  import_tasks: restart_mssql_server.yml
+
+- name: Get MSSQL version
+  ansible.builtin.command: "{{ mssql_tools_bin_path }}/sqlcmd -S localhost -U SA -P '{{ vars.MSSQL_SA_PASSWORD }}' -Q \"SELECT @@VERSION\""
+  retries: 5
+  delay: 3
+  register: result
+  until: result.rc == 0
+
+- name: print result
+  ansible.builtin.debug:
+    var: result.stdout

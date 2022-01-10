@@ -1,0 +1,6 @@
+---
+- name: Auto-Fail
+  ansible.builtin.assert:
+    that:
+      - false
+    msg: To-Do

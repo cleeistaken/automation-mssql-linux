@@ -1,0 +1,143 @@
+---
+#
+# Firewall Ports
+# Todo
+# - set as variables
+- name: Set the firewall ports variable
+  set_fact:
+    firewall_ports:
+      - { port: 2224, proto: "tcp" }
+      - { port: 3121, proto: "tcp" }
+      - { port: 5022, proto: "tcp" }
+      - { port: 5405, proto: "udp" }
+      - { port: 21064, proto: "tcp" }
+
+- name: Configure firewall Ubuntu
+  community.general.ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+  loop: "{{ firewall_ports }}"
+  when: is_ubuntu
+
+- name: Configure firewall CentOS
+  ansible.posix.firewalld:
+    port: "{{ item.port }}/{{ item.proto }}"
+    permanent: yes
+    state: enabled
+  loop: "{{ firewall_ports }}"
+  when: is_centos
+
+#
+# Enable HA Health Monitoring TransactSQL
+# Todo: should this be started also?
+- name: Enable HA Health Monitoring
+  ansible.builtin.command: >
+    {{ mssql_tools_bin_path }}/sqlcmd 
+    -s localhost 
+    -U SA 
+    -P "{{ MSSQL_SA_PASSWORD }}"
+    -Q "ALTER EVENT SESSION AlwaysOn_health ON SERVER WITH (STARTUP_STATE=ON);"
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result.stdout
+
+#
+# Create the MSSQL Availability Group on the Primary Node
+#
+- name: Build node parameters
+  set_fact:
+    ag_node_parameters: >
+      {{ ag_node_parameters | default("") }}N'{{ item }}' WITH (ENDPOINT_URL = N'tcp://{{ item }}:{{ mssql_listener_port | default(default_mssql_listener_port) }}', AVAILABILITY_MODE = SYNCHRONOUS_COMMIT, FAILOVER_MODE = EXTERNAL, SEEDING_MODE = AUTOMATIC)
+  loop: "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'ansible_hostname') | list }}"
+  when: inventory_hostname == play_hosts[0]
+
+- name: Create the mssql availability group on the primary node
+  ansible.builtin.command: >
+    {{ mssql_tools_bin_path }}/sqlcmd 
+    -s localhost 
+    -U SA 
+    -P "{{ MSSQL_SA_PASSWORD }}"
+    -Q "IF NOT EXISTS (SELECT name FROM master.sys.availability_groups WHERE name = '{{ MSSQL_AG_NAME }}') BEGIN CREATE AVAILABILITY GROUP [{{ MSSQL_AG_NAME }}] WITH (DB_FAILOVER = ON, CLUSTER_TYPE = EXTERNAL) FOR REPLICA ON {{  ag_node_parameters.splitlines() | join(',') }}; ALTER AVAILABILITY GROUP [{{ MSSQL_AG_NAME }}] GRANT CREATE ANY DATABASE END;"
+  register: result
+  when: inventory_hostname == play_hosts[0]
+
+- debug:
+    var: result.stdout
+  when: inventory_hostname == play_hosts[0]
+
+#
+# Join the MSSQL Availability Group on the Secondary Nodes
+#
+- name: Join the mssql availability group on the secondary nodes
+  ansible.builtin.command: >
+    {{ mssql_tools_bin_path }}/sqlcmd 
+    -s localhost 
+    -U SA 
+    -P "{{ MSSQL_SA_PASSWORD }}"
+    -Q "IF NOT EXISTS (SELECT name FROM master.sys.availability_groups WHERE name = '{{ MSSQL_AG_NAME }}') BEGIN ALTER AVAILABILITY GROUP [{{ MSSQL_AG_NAME }}] JOIN WITH (CLUSTER_TYPE = EXTERNAL); ALTER AVAILABILITY GROUP [{{ MSSQL_AG_NAME }}] GRANT CREATE ANY DATABASE END;"
+  register: result
+  when: inventory_hostname != play_hosts[0]
+
+- debug:
+    var: result.stdout
+  when: inventory_hostname != play_hosts[0]
+
+#
+# Create Database
+#
+- name: "Create database {{ MSSQL_AG_DB_NAME }}"
+  ansible.builtin.command: >
+    {{ mssql_tools_bin_path }}/sqlcmd 
+    -s localhost 
+    -U SA 
+    -P "{{ MSSQL_SA_PASSWORD }}"
+    -Q "IF NOT EXISTS (SELECT name from master.sys.databases WHERE name = '{{ MSSQL_AG_DB_NAME }}') BEGIN CREATE DATABASE [{{ MSSQL_AG_DB_NAME }}]; ALTER DATABASE [{{ MSSQL_AG_DB_NAME }}] SET RECOVERY FULL END;"
+  register: result
+  when: inventory_hostname == play_hosts[0]
+
+- debug:
+    var: result.stdout
+  when: inventory_hostname == play_hosts[0]
+
+#
+# Create database backup
+#
+- name: Delete previous database backup
+  ansible.builtin.file:
+    path: "{{ MSSQL_DIRECTORY_BACKUP }}/{{ MSSQL_AG_DB_NAME }}.bak"
+    state: absent
+  when: inventory_hostname == play_hosts[0]
+
+- name: "Backup database {{ MSSQL_AG_DB_NAME }} to {{ MSSQL_DIRECTORY_BACKUP }}/{{ MSSQL_AG_DB_NAME }}.bak"
+  ansible.builtin.command: >
+    {{ mssql_tools_bin_path }}/sqlcmd 
+    -s localhost 
+    -U SA 
+    -P "{{ MSSQL_SA_PASSWORD }}"
+    -Q "BACKUP DATABASE [{{ MSSQL_AG_DB_NAME }}] TO DISK = N'{{ MSSQL_DIRECTORY_BACKUP }}/{{ MSSQL_AG_DB_NAME }}.bak'"
+  register: result
+  when: inventory_hostname == play_hosts[0]
+
+- debug:
+    var: result.stdout
+  when: inventory_hostname == play_hosts[0]
+
+#
+# Add Database to Availability Group
+#
+- name: "Add database {{ MSSQL_AG_DB_NAME }} to availability group {{ MSSQL_AG_NAME }}"
+  ansible.builtin.command: >
+    {{ mssql_tools_bin_path }}/sqlcmd 
+    -s localhost 
+    -U SA 
+    -P "{{ MSSQL_SA_PASSWORD }}"
+    -Q "IF NOT EXISTS (SELECT AGDatabases.database_name AS name FROM sys.dm_hadr_availability_group_states States INNER JOIN master.sys.availability_groups Groups ON States.group_id = Groups.group_id INNER JOIN sys.availability_databases_cluster AGDatabases ON Groups.group_id = AGDatabases.group_id WHERE primary_replica = @@Servername AND AGDatabases.database_name = '{{ MSSQL_AG_DB_NAME }}') BEGIN ALTER AVAILABILITY GROUP [{{ MSSQL_AG_NAME }}] ADD DATABASE [{{ MSSQL_AG_DB_NAME }}] END;"
+  register: result
+  when: inventory_hostname == play_hosts[0]
+
+- debug:
+    var: result.stdout
+  when: inventory_hostname == play_hosts[0]

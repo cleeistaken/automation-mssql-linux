@@ -1,0 +1,39 @@
+---
+- name: Set distribution
+  set_fact:
+    is_centos: "{{ ansible_distribution == 'CentOS' }}"
+    is_debian: "{{ ansible_distribution == 'Debian' }}"
+    is_redhat: "{{ ansible_distribution == 'RedHat' }}"
+    is_ubuntu: "{{ ansible_distribution == 'Ubuntu' }}"
+
+- name: Print distribution
+  debug:
+    msg: "CentOS: {{ is_centos }}\nDebian: {{ is_debian }}\nRedHat: {{ is_redhat }}\nUbuntu: {{ is_ubuntu }}"
+
+- name: Upgrade all packages
+  import_tasks: upgrade_packages.yml
+  when: vars.upgrade_all_packages
+
+- name: Create hosts file
+  import_tasks: create_hosts_file.yml
+  when: vars.hosts_file_create
+
+- name: Disable firewall
+  import_tasks: disable_firewall.yml
+  when: vars.firewall_disable
+
+- name: Disable SELinux
+  import_tasks: disable_selinux.yml
+  when: vars.selinux_disable
+
+- name: Extend OS LVM
+  import_tasks: extend_os_lvm.yml
+  when: vars.extend_os_lvm
+
+- name: Partition, format, and mount data disks
+  import_tasks: mount_data_disks.yml
+  when: vars.mount_data_disks
+
+- name: Create system user account
+  import_tasks: create_system_user.yml
+  when: user_create

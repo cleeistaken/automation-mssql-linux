@@ -1,0 +1,89 @@
+---
+- name: Create host parameters
+  set_fact:
+    pcs_fqdn: "{{ pcs_fqdn | default([]) + [ item.0 ]}}"
+    pcs_host_addrs: "{{ pcs_host_addrs | default([]) + [ item.0 + ' addr=' + item.2 ]}}"
+  with_together:
+    - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'ansible_fqdn') }}"
+    - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'uuid') }}"
+    - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, ['ansible_default_ipv4', 'address'])  }}"
+
+- name: Authenticate pacemaker nodes
+  ansible.builtin.command: >
+    pcs host -u hacluster -p {{ HACLUSTER_PASSWORD }} auth {{ pcs_fqdn | join(' ') }}
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result
+
+- name: Get PCS cluster status
+  ansible.builtin.command: >
+    pcs cluster status
+  register: result
+  failed_when: result.rc not in [ 0, 1 ]
+
+- name: Set cluster status
+  set_fact:
+    cluster_running: "{{ not ('Error: cluster is not currently running on this node' in [result.stdout, result.stderr]) }}"
+
+- name: Output
+  debug:
+    var: cluster_running
+
+- name: Create and start cluster
+  ansible.builtin.command: >
+    pcs cluster setup {{ pcs_cluster_name | default(default_pcs_cluster_name) }} {{ pcs_host_addrs | join(' ') }} --start --enable
+  register: result
+  when: not cluster_running
+
+- name: Output
+  debug:
+    var: result
+
+- name: Set pcs property stonith-enabled to false
+  ansible.builtin.command: >
+    pcs property set stonith-enabled=false
+  register: result
+
+- name: Output
+  debug:
+    var: result.stdout
+
+- name: Set pcs property no-quorum-polic to ignore
+  ansible.builtin.command: >
+    pcs property set no-quorum-policy=ignore
+  register: result
+
+- name: Output
+  debug:
+    var: result.stdout
+
+- name: Get cluster status
+  ansible.builtin.command: "pcs cluster status"
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result.stdout
+
+- name: Wait for PCS cluster to start
+  pause:
+    seconds: 15
+
+- name: Get cluster status
+  ansible.builtin.command: "pcs cluster status"
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result.stdout
+
+- name: "Create PCS IP resource {{ PCS_RESOURCE_VIP_NAME | default(default_pcs_resource_vip_name) }} with IP {{ PCS_CLUSTER_VIP_CIDR | ansible.netcommon.ipaddr('address') }}"
+  ansible.builtin.command: >
+    pcs resource create {{ PCS_RESOURCE_VIP_NAME | default(default_pcs_resource_vip_name) }} ocf:heartbeat:IPaddr2 ip={{ PCS_CLUSTER_VIP_CIDR | ansible.netcommon.ipaddr('address') }} cidr_netmask={{ PCS_CLUSTER_VIP_CIDR | ansible.netcommon.ipaddr('prefix') }}
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result
