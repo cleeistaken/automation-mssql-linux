@@ -27,9 +27,9 @@
   import_tasks: configure_pacemaker_primary.yml
   when: inventory_hostname == play_hosts[0]
 
-#- name: Configure MSSQL Availability Group
-#  import_tasks: configure_mssql_ag.yml
+- name: Configure MSSQL Availability Group
+  import_tasks: configure_mssql_ag.yml
 
-#- name: Configure Pacemaker AG resource on the primary node
-#  import_tasks: configure_pacemaker_ag.yml
-#  when: inventory_hostname == play_hosts[0]
+- name: Configure Pacemaker AG resource on the primary node
+  import_tasks: configure_pacemaker_ag.yml
+  when: inventory_hostname == play_hosts[0]

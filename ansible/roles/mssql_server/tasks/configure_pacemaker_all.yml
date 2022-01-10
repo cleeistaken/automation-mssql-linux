@@ -53,14 +53,14 @@
   ansible.builtin.debug:
     var: result.stdout
 
-- name: "Grant permissions to user {{ SQL_Pace_USER }} on Availability Group {{ MSSQL_AG_NAME }}"
-  ansible.builtin.command: >
-    {{ mssql_tools_bin_path }}/sqlcmd 
-    -s localhost 
-    -U SA 
-    -P "{{ MSSQL_SA_PASSWORD }}"
-    -Q "GRANT ALTER, CONTROL, VIEW DEFINITION ON AVAILABILITY GROUP::{{ MSSQL_AG_NAME }} TO {{ SQL_Pace_USER }}; GRANT VIEW SERVER STATE TO {{ SQL_Pace_USER }};"
-  register: result
+#- name: "Grant permissions to user {{ SQL_Pace_USER }} on Availability Group {{ MSSQL_AG_NAME }}"
+#  ansible.builtin.command: >
+#    {{ mssql_tools_bin_path }}/sqlcmd 
+#    -s localhost 
+#    -U SA 
+#    -P "{{ MSSQL_SA_PASSWORD }}"
+#    -Q "GRANT ALTER, CONTROL, VIEW DEFINITION ON AVAILABILITY GROUP::{{ MSSQL_AG_NAME }} TO {{ SQL_Pace_USER }}; GRANT VIEW SERVER STATE TO {{ SQL_Pace_USER }};"
+#  register: result
 
 - name: Print command output
   ansible.builtin.debug:

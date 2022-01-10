@@ -23,7 +23,7 @@
 
 - name: Create AG cluster resource
   ansible.builtin.command: >
-    pcs resource create {{ ag_cluster }} ocf:mssql:ag ag_name={{ MSSQL_AG_NAME }} meta failure-timeout=30s --master meta notify=true
+    pcs resource create {{ ag_cluster }} ocf:mssql:ag ag_name={{ MSSQL_AG_NAME }} meta failure-timeout=30s promotable notify=true
 
 - name: Output
   ansible.builtin.debug:
