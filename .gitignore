@@ -1,6 +1,9 @@
 #
 config/*.cer
 config/inventory.yml
+config/settings-template.yml
+config/terraform.tfvars
+
 
 # jetbrains
 .idea/*
