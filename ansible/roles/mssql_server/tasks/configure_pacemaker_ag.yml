@@ -38,6 +38,15 @@
   ansible.builtin.debug:
     var: result
 
+- name: Add pcs constraint colocation
+  ansible.builtin.command:  >
+    sudo pcs resource update {{ ag_cluster }} required_synchronized_secondaries_to_commit=1
+  register: result
+
+- name: Output
+  ansible.builtin.debug:
+    var: result
+
 - name: Add pcs constraint ordering
   ansible.builtin.command: >
     pcs constraint order promote {{ ag_cluster }}-clone then start {{ PCS_RESOURCE_VIP_NAME | default(default_pcs_resource_vip_name) }}
