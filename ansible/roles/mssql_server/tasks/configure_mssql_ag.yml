@@ -46,12 +46,14 @@
 
 #
 # Create the MSSQL Availability Group on the Primary Node
-#
+# we might need to switc the first item to hostname and second to fqdn
 - name: Build node parameters
   set_fact:
     ag_node_parameters: >
-      {{ ag_node_parameters | default("") }}N'{{ item }}' WITH (ENDPOINT_URL = N'tcp://{{ item }}:{{ mssql_listener_port | default(default_mssql_listener_port) }}', AVAILABILITY_MODE = SYNCHRONOUS_COMMIT, FAILOVER_MODE = EXTERNAL, SEEDING_MODE = AUTOMATIC)
-  loop: "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'ansible_hostname') | list }}"
+      {{ ag_node_parameters | default("") }}N'{{ item.0 }}' WITH (ENDPOINT_URL = N'tcp://{{ item.1 }}:{{ mssql_listener_port | default(default_mssql_listener_port) }}', AVAILABILITY_MODE = SYNCHRONOUS_COMMIT, FAILOVER_MODE = EXTERNAL, SEEDING_MODE = AUTOMATIC)
+  with_together:
+    - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'ansible_hostname') | list }}"
+    - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'ansible_fqdn') | list }}"
   when: inventory_hostname == play_hosts[0]
 
 - name: Create the mssql availability group on the primary node
