@@ -40,7 +40,7 @@
 
 - name: Add pcs constraint colocation
   ansible.builtin.command:  >
-    sudo pcs resource update {{ ag_cluster }} required_synchronized_secondaries_to_commit=1
+    pcs resource update {{ ag_cluster }} required_synchronized_secondaries_to_commit=1
   register: result
 
 - name: Output
