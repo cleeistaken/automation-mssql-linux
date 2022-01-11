@@ -10,7 +10,7 @@
     pcs_mappings: "{{ pcs_mappings | default([]) + [ item.0 + ':' + item.1 ]}}"
     pcs_host_addrs: "{{ pcs_host_addrs | default([]) + [ item.0 + ' addr=' + item.2 ]}}"
   with_together:
-    - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'ansible_fqdn') }}"
+    - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'ansible_hostname') }}"
     - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'uuid') }}"
     - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, ['ansible_default_ipv4', 'address'])  }}"
 
@@ -56,14 +56,14 @@
   ansible.builtin.debug:
     var: result
 
-- name: Add pcs constraint location preference
-  ansible.builtin.command: >
-    pcs constraint location {{ ag_cluster }}-clone prefers {{ ansible_fqdn }}
-  register: result
+#- name: Add pcs constraint location preference
+#  ansible.builtin.command: >
+#    pcs constraint location {{ ag_cluster }}-clone prefers {{ ansible_hostname }}
+#  register: result
 
-- name: Output
-  ansible.builtin.debug:
-    var: result
+#- name: Output
+#  ansible.builtin.debug:
+#    var: result
 
 #
 # PCS Resource Cleanup

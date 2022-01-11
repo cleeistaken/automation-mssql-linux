@@ -70,8 +70,8 @@ all:
     SQL_INSTALL_INTG_SVC: N
     SQL_INSTALL_EXT: Y
     SQL_INSTALL_HA_Pace: Y
-    SQL_INSTALL_USER: dejisqlnux
-    SQL_INSTALL_USER_PASSWORD: cashc0wBunG@!
+    SQL_INSTALL_USER: vmware
+    SQL_INSTALL_USER_PASSWORD: VMware1!
     SQL_Pace_USER: pacesqlnux
     SQL_Pace_USER_PASSWORD: cashc0wBunG@!
     ACCEPT_EULA: Y
