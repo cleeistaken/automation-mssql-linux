@@ -10,5 +10,5 @@
 - name: Comment out pipeline archive in fstab
   replace:
     dest: "{{ hosts_file }}"
-    regexp: '^127.0.0.1'
-    replace: '#127.0.0.1'
+    regexp: '^127.0.1.1'
+    replace: '#127.0.1.1'
