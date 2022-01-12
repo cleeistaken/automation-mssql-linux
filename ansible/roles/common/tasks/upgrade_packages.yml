@@ -39,6 +39,6 @@
   reboot:
     reboot_timeout: 300
   when: >
-    ((ansible_distribution == 'Debian' or or ansible_distribution == 'Ubuntu') and (reboot_required_file is defined and reboot_required_file.stat.exists)) or
+    ((ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and (reboot_required_file is defined and reboot_required_file.stat.exists)) or
     ((ansible_distribution == 'CentOS' or ansible_distribution == 'RedHat') and (restart_required is defined and restart_required.rc == 1))
 
