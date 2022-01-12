@@ -3,7 +3,8 @@
   yum:
     name: '*'
     state: latest
-  when: is_centos or is_redhat
+  when: ansible_distribution == 'CentOS' or
+        ansible_distribution == 'RedHat'
 
 - name: Install yum-utils CentOS or RedHat
   yum:
