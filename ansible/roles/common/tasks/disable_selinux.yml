@@ -1,11 +1,11 @@
 ---
-- name: Install required libraries Ubuntu
+- name: Install required libraries for Ubuntu
   apt:
     name:
       - python3-selinux
       - selinux-policy-default
     state: present
-  when: is_ubuntu
+  when: ansible_distribution == 'Ubuntu'
 
 - name: Disable SELinux
   ansible.posix.selinux:
@@ -13,7 +13,6 @@
   register: selinux_state
 
 - name: Perform reboot if required
-  reboot:
+  ansible.builtin.reboot:
     reboot_timeout: 300
   when: selinux_state.changed
-

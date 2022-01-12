@@ -1,22 +1,27 @@
 ---
-# Hosts file parameters
-hosts_file: /etc/hosts
-hosts_file_create: true
+# Packages
+DEFAULT_SYSTEM_UPGRADE_ALL_PACKAGES: false
 
-# Firewall parameters
-firewall_disable: true
+# Hosts file
+DEFAULT_SYSTEM_HOSTS_FILE_CREATE: false
+DEFAULT_SYSTEM_HOSTS_FILE: /etc/hosts
+
+# Firewall
+DEFAULT_SYSTEM_FIREWALL_DISABLE: false
 
 # Selinux paramters
-selinux_disable: true
+DEFAULT_SYSTEM_SELINUX_DISABLE: false
 
 # Extend OS LVM
-extend_os_lvm: true
+DEFAULT_SYSTEM_EXTEND_OS_LVM: false
 
 # Data disks
-data_disk_filesystem: xfs
-data_disk_mount_options: noatime
-data_disk_mount_default_path: /mnt/data
+DEFAULT_SYSTEM_MOUNT_DATA_DISKS: false
+DEFAULT_SYSTEM_DATA_DISKS FILESYSTEM: xfs
+DEFAULT_SYSTEM_MOUNT_OPTIONS: noatime
+DEFAULT_SYSTEM_MOUNT_PATH: /mnt/data
 
-# User  parameters
-user_create: false
-user_hash_salt: "{{ lookup('community.general.random_string', length=16, min_lower=1, min_upper=1, special=false, min_numeric=1) }}"
+# User parameters
+DEFAULT_SYSTEM_CREATE_USER: false
+DEFAULT_SYSTEM_USER_USERNAME: vmware
+DEFAULT_SYSTEM_USER_PASSWORD: vmware

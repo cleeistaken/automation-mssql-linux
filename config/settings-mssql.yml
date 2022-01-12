@@ -1,21 +1,34 @@
 ---
 all:
   vars:
+
+    #
+    #
+    #
+
     # Host packages
-    upgrade_all_packages: yes
+    # Upgrade all the system packages.
+    system_upgrade_all_packages: true
 
     # Hosts file
-    hosts_file_create: true
+    # Edit the hosts file and add entries for each system.
+    system_hosts_file_create: true
+    system_hosts_file: /etc/hosts
 
     # Firewall
-    firewall_disable: true
+    # Entirely disable the firewall.
+    system_firewall_disable: true
 
     # SELinux
-    selinux_disable: true
+    # Entirely disable SELinux on the hosts.
+    system_selinux_disable: true
 
-    # Disks
-    extend_os_lvm: true
-    mount_data_disks: true
+    # OS Disk
+    # If the OS disks has been increased should the LVM be extended and use all the available space.
+    system_extend_os_lvm: true
+
+
+    system_mount_data_disks: true
     data_disk_mount_paths: [ '/sqlnux' ]
 
     # User

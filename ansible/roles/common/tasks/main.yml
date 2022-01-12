@@ -1,39 +1,45 @@
 ---
-- name: Set distribution
-  set_fact:
-    is_centos: "{{ ansible_distribution == 'CentOS' }}"
-    is_debian: "{{ ansible_distribution == 'Debian' }}"
-    is_redhat: "{{ ansible_distribution == 'RedHat' }}"
-    is_ubuntu: "{{ ansible_distribution == 'Ubuntu' }}"
-
 - name: Print distribution
   debug:
-    msg: "CentOS: {{ is_centos }}\nDebian: {{ is_debian }}\nRedHat: {{ is_redhat }}\nUbuntu: {{ is_ubuntu }}"
+    msg: "The system distribution is: {{ ansible_distribution }}"
 
 - name: Upgrade all packages
   import_tasks: upgrade_packages.yml
-  when: vars.upgrade_all_packages
+  when: system_upgrade_all_packages | default(DEFAULT_SYSTEM_UPGRADE_ALL_PACKAGES)
 
 - name: Create hosts file
   import_tasks: create_hosts_file.yml
-  when: vars.hosts_file_create
+  vars:
+    ansible_group: "{{ groups['all'] }}"
+    hosts_file: "{{ system_hosts_file | default(DEFAULT_SYSTEM_HOSTS_FILE) }}"
+    disable_entries:
+      - 127.0.1.1
+  when: hosts_file_create | default(DEFAULT_SYSTEM_HOSTS_FILE_CREATE)
 
 - name: Disable firewall
   import_tasks: disable_firewall.yml
-  when: vars.firewall_disable
+  when: system_firewall_disable | default(DEFAULT_SYSTEM_FIREWALL_DISABLE)
 
 - name: Disable SELinux
   import_tasks: disable_selinux.yml
-  when: vars.selinux_disable
+  when: system_selinux_disable | default(DEFAULT_SYSTEM_SELINUX_DISABLE)
 
 - name: Extend OS LVM
   import_tasks: extend_os_lvm.yml
-  when: vars.extend_os_lvm
+  when: system_extend_os_lvm | default(DEFAULT_SYSTEM_EXTEND_OS_LVM)
 
 - name: Partition, format, and mount data disks
   import_tasks: mount_data_disks.yml
-  when: vars.mount_data_disks
+     vars:
+       data_disk_filesystem:
+       data_disk_mount_option: xfs
+       data_disk_mount_path: /mnt/data
+  when: system_mount_data_disks | default(DEFAULT_SYSTEM_MOUNT_DATA_DISKS)
 
-- name: Create system user account
+- name: Create user account
   import_tasks: create_system_user.yml
-  when: user_create
+  vars:
+    user_username: "{{ system_user_username | default(DEFAULT_SYSTEM_USER_USERNAME) }}"
+    user_password: "{{ system_user_password | default(DEFAULT_SYSTEM_USER_PASSWORD) }}"
+    ssh_key: "{{ vm_ssh_key_file }}"
+  when: user_create | default(DEFAULT_SYSTEM_CREATE_USER)

@@ -1,41 +1,58 @@
 ---
+- name: Fail on unexpected distributions
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution == 'CentOS' or
+        ansible_distribution == 'Debian' or
+        ansible_distribution == 'RedHat' or
+        ansible_distribution == 'Ubuntu'
+    fail_msg: "Unexpected distribution: {{ ansible_distribution }}"
+    success_msg: "Supported distribution"
+
 - name: Validate username and password are defined
-  assert:
+  ansible.builtin.assert:
     that: user_username is defined and user_password is defined
     fail_msg: "Both 'user_username' and 'user_password' must be defined"
 
 - name: Validate username is not empty
-  assert:
-    that: user_username|length >= 3
+  ansible.builtin.assert:
+    that: user_username | length >= 3
     fail_msg: "'user_username' must not be empty and and least 3 characters"
 
 - name: Validate password is not empty
-  assert:
-    that: user_password|length >= 6
+  ansible.builtin.assert:
+    that: user_password | length >= 6
     fail_msg: "'user_password' must not be empty and and least 6 characters"
 
 - name: Set OS options CentOS
   set_fact:
     shell_path: /usr/bin/bash
     sudo_group: wheel
-  when: is_centos
+  when: ansible_distribution == 'CentOS' or
+        ansible_distribution == 'RedHat'
 
 - name: Set OS options Ubuntu
   set_fact:
     shell_path: /usr/bin/bash
     sudo_group: sudo
-  when: is_ubuntu
+  when: ansible_distribution == 'Debian' or 
+        ansible_distribution == 'Ubuntu'
+
+- name: Create password hash salt
+  set_fact:
+    hash_salt: "{{ lookup('community.general.random_string', length=16, min_lower=1, min_upper=1, special=false, min_numeric=1) }}"
 
 - name: "Create user {{ vars.user_username }}"
   user:
     name: "{{ vars.user_username }}"
-    password: "{{ vars.user_password | password_hash('sha512', user_hash_salt) }}"
+    password: "{{ vars.user_password | password_hash('sha512', hash_salt) }}"
     shell: "{{ shell_path }}"
     groups: "{{ sudo_group }}"
     append: yes
 
 - name: Set authorized key taken from file
   ansible.posix.authorized_key:
-    user: "{{ vars.user_username }}"
+    user: "{{ user_username }}"
     state: present
     key: "{{ lookup('file', vars.vm_ssh_key_file) }}"
+  when: vars.vm_ssh_key_file

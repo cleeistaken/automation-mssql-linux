@@ -1,12 +1,24 @@
 ---
+- name: Fail on unexpected distributions
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution == 'CentOS' or
+        ansible_distribution == 'Debian' or
+        ansible_distribution == 'RedHat' or
+        ansible_distribution == 'Ubuntu'
+    fail_msg: "Unexpected distribution: {{ ansible_distribution }}"
+    success_msg: "Supported distribution"
+
 - name: Stop and disable firewalld
   systemd:
     name: firewalld
     state: stopped
     enabled: false
-  when: is_centos or is_redhat
+  when: ansible_distribution == 'CentOS' or
+        ansible_distribution == 'RedHat'
 
 - name: Stop and disable ufw
   community.general.ufw:
     state: disabled
-  when: is_debian or is_ubuntu
+  when: ansible_distribution == 'Debian' or 
+        ansible_distribution == 'Ubuntu'
