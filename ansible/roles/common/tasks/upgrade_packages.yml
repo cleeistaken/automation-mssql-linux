@@ -9,26 +9,30 @@
   yum:
     name: yum-utils
     state: latest
-  when: is_centos or is_redhat
+  when: ansible_distribution == 'CentOS' or
+        ansible_distribution == 'RedHat'
 
 - name: Check if reboot is needed for CentOS or Redhat
   command: needs-restarting
   register: restart_required
   failed_when: restart_required.rc not in [0, 1]
-  when: is_centos or is_redhat
+  when: ansible_distribution == 'CentOS' or
+        ansible_distribution == 'RedHat'
 
 - name: Upgrade all packages Ubuntu or Debian
   apt:
     upgrade: dist
     force_apt_get: yes
-  when: is_debian or is_ubuntu
+  when: ansible_distribution == 'Debian' or 
+        ansible_distribution == 'Ubuntu'
 
 - name: Check if a reboot is needed for Debian or Ubuntu
   ansible.builtin.stat:
     path: /var/run/reboot-required
     get_md5: no
   register: reboot_required_file
-  when: is_debian or is_ubuntu
+  when: ansible_distribution == 'Debian' or 
+        ansible_distribution == 'Ubuntu'
 
 - name: Perform reboot if required
   reboot:
