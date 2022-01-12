@@ -30,10 +30,10 @@
 
 - name: Partition, format, and mount data disks
   import_tasks: mount_data_disks.yml
-     vars:
-       data_disk_filesystem:
-       data_disk_mount_option: xfs
-       data_disk_mount_path: /mnt/data
+  vars:
+    data_disk_filesystem:
+    data_disk_mount_option: xfs
+    data_disk_mount_path: /mnt/data
   when: system_mount_data_disks | default(DEFAULT_SYSTEM_MOUNT_DATA_DISKS)
 
 - name: Create user account
