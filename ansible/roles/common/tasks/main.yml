@@ -40,4 +40,4 @@
 
 - name: Create user account
   import_tasks: create_system_user.yml
-  when: system_create_user | default(default_system_create_user)
+  when: system_create_account | default(default_system_create_account)

@@ -14,9 +14,6 @@
   community.general.parted: "device={{ os_device }} unit=MiB"
   register: sd_info
 
-- debug:
-    var: sd_info
-
 - name: Extend the LVM partition
   community.general.parted:
     device: "{{ os_device }}"
