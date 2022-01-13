@@ -1,7 +1,18 @@
 ---
 - name: Print distribution
-  debug:
+  ansible.builtin.debug:
     msg: "The system distribution is: {{ ansible_distribution }}"
+
+- name: Print distribution
+  ansible.builtin.debug:
+    msg: |
+      Upgrade packages: {{ system_upgrade_all_packages }}
+      Create hosts file: {{ system_hosts_file_create }}
+      Disable firewall: {{ system_firewall_disable }}
+      Disable SELinux: {{ system_selinux_disable }}
+      Extend OS LVM: {{ system_extend_os_lvm }}
+      Mount data disks: {{ system_mount_data_disks }}
+      Create user account: {{ system_user_create }}
 
 - name: Upgrade all system packages
   import_tasks: upgrade_system_packages.yml
