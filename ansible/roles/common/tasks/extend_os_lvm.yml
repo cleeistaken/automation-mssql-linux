@@ -4,7 +4,10 @@
     gather_subset:
       - '!all'
       - '!min'
-      - hardware
+      - 'hardware'
+
+- debug:
+    var: ansible_facts.lvm
 
 - name: Read device information (always use unit when probing)
   community.general.parted: device=/dev/sda unit=MiB
