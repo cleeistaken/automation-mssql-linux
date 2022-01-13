@@ -66,10 +66,6 @@
   register: result
   when: inventory_hostname == play_hosts[0]
 
-- debug:
-    var: result.stdout
-  when: inventory_hostname == play_hosts[0]
-
 #
 # Join the MSSQL Availability Group on the Secondary Nodes
 #
@@ -81,10 +77,6 @@
     -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
     -Q "IF NOT EXISTS (SELECT name FROM master.sys.availability_groups WHERE name = '{{ mssql_ag_name | default(default_mssql_ag_name) }}') BEGIN ALTER AVAILABILITY GROUP [{{ mssql_ag_name | default(default_mssql_ag_name) }}] JOIN WITH (CLUSTER_TYPE = EXTERNAL); ALTER AVAILABILITY GROUP [{{ mssql_ag_name | default(default_mssql_ag_name) }}] GRANT CREATE ANY DATABASE END;"
   register: result
-  when: inventory_hostname != play_hosts[0]
-
-- debug:
-    var: result.stdout
   when: inventory_hostname != play_hosts[0]
 
 #

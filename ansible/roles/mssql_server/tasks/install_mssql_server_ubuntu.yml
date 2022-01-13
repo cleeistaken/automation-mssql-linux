@@ -78,16 +78,16 @@
     dest=/etc/environment
     state=present
     backrefs=yes
-    regexp='PATH=(["]*)((?!.*?{{mssql_bin_path}}).*?)(["]*)$'
-    line="PATH=\1\2:{{mssql_bin_path}}\3"
+    regexp='PATH=(["]*)((?!.*?{{ mssql_bin_path }}).*?)(["]*)$'
+    line="PATH=\1\2:{{ mssql_bin_path }}\3"
 
 - name: "Add {{ mssql_tools_bin_path }} to path"
   ansible.builtin.lineinfile: >
     dest=/etc/environment
     state=present
     backrefs=yes
-    regexp='PATH=(["]*)((?!.*?{{mssql_tools_bin_path}}).*?)(["]*)$'
-    line="PATH=\1\2:{{mssql_tools_bin_path}}\3"
+    regexp='PATH=(["]*)((?!.*?{{ mssql_tools_bin_path }}).*?)(["]*)$'
+    line="PATH=\1\2:{{ mssql_tools_bin_path }}\3"
 
 # re: apt upgrade full raises a "Could not get lock /var/lib/dpkg/lock-frontend"
 # https://github.com/ansible/ansible/issues/51663

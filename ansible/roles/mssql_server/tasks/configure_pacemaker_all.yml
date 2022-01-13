@@ -69,7 +69,7 @@
 - name: Save credentials for pacemaker login
   copy:
     dest: /var/opt/mssql/secrets/passwd
-    mode: 400
+    mode: '400'
     owner: root
     group: root
     content: |
