@@ -28,7 +28,7 @@
 
 - name: "Resize the volume group /dev/sda{{ sd_info.partitions | length }} to the maximum possible"
   community.general.lvg:
-    vg: "{{ ansible_facts.lvm.pvs['/dev/sda'{{ sd_info.partitions | length }}].vg }}"
+    vg: "{{ ansible_facts.lvm.pvs['/dev/sda'(sd_info.partitions | length)].vg }}"
     pvs: "/dev/sda{{ sd_info.partitions | length }}"
     pvresize: yes
 
