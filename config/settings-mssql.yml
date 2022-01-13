@@ -27,6 +27,7 @@ all:
     # OS Disk
     # If the OS disks has been increased should the LVM be extended and use all the available space.
     system_extend_os_lvm: true
+    #system_extend_os_lvm_device: /dev/sda
 
     # Data Disk(s)
     system_mount_data_disks: true

@@ -6,30 +6,32 @@
       - '!min'
       - 'hardware'
 
+- name: Set root logical volume device
+  set_fact:
+    os_device: "{{ system_extend_os_lvm_device | default(default_system_extend_os_lvm_device) }}"
+
 - name: Read device information (always use unit when probing)
-  community.general.parted: device=/dev/sda unit=MiB
+  community.general.parted: "device={{ os_device }} unit=MiB"
   register: sd_info
 
 - name: Extend the LVM partition
   community.general.parted:
-    device: /dev/sda
+    device: "{{ os_device }}"
     label: gpt
     number: "{{ sd_info.partitions | length }}"
     part_end: "100%"
     resize: true
     state: present
 
-- name: "Resize the volume group /dev/sda{{ sd_info.partitions | length }} to the maximum possible"
+- name: "Resize the volume group {{ os_device }}{{ sd_info.partitions | length }} to the maximum possible"
   community.general.lvg:
-    vg: "{{ ansible_facts.lvm.pvs['/dev/sda' + (sd_info.partitions | length | string)].vg }}"
-    pvs: "/dev/sda{{ sd_info.partitions | length }}"
+    vg: "{{ ansible_facts.lvm.pvs[os_device + (sd_info.partitions | length | string)].vg }}"
+    pvs: "{{ os_device }}{{ sd_info.partitions | length }}"
     pvresize: yes
 
 - name: Expand the filesystem to all available space
   community.general.lvol:
-    vg: "{{ ansible_facts.lvm.pvs['/dev/sda' + (sd_info.partitions | length | string)].vg }}"
+    vg: "{{ ansible_facts.lvm.pvs[os_device + (sd_info.partitions | length | string)].vg }}"
     lv: "{{ ansible_facts.lvm.lvs.keys() | list | first }}"
     size: +100%FREE
     resizefs: true
-
-

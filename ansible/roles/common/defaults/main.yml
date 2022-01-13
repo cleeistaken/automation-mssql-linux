@@ -16,6 +16,7 @@ default_system_selinux_disable: false
 
 # Extend OS LVM
 default_system_extend_os_lvm: false
+default_system_extend_os_lvm_device: /dev/sda
 
 # Data disks
 default_system_mount_data_disks: false
