@@ -16,28 +16,28 @@
 
 - name: Upgrade all system packages
   import_tasks: upgrade_system_packages.yml
-  when: system_upgrade_all_packages | default(DEFAULT_SYSTEM_UPGRADE_ALL_PACKAGES)
+  when: system_upgrade_all_packages | default(default_system_upgrade_all_packages)
 
 - name: Update hosts file
   import_tasks: update_hosts_file.yml
-  when: system_hosts_file_create | default(DEFAULT_SYSTEM_HOSTS_FILE_CREATE)
+  when: system_hosts_file_create | default(default_system_hosts_file_create)
 
 - name: Disable firewall
   import_tasks: disable_firewall.yml
-  when: system_firewall_disable | default(DEFAULT_SYSTEM_FIREWALL_DISABLE)
+  when: system_firewall_disable | default(default_system_firewall_disable)
 
 - name: Disable SELinux
   import_tasks: disable_selinux.yml
-  when: system_selinux_disable | default(DEFAULT_SYSTEM_SELINUX_DISABLE)
+  when: system_selinux_disable | default(default_system_selinux_disable)
 
 - name: Extend OS LVM
   import_tasks: extend_os_lvm.yml
-  when: system_extend_os_lvm | default(DEFAULT_SYSTEM_EXTEND_OS_LVM)
+  when: system_extend_os_lvm | default(default_system_extend_os_lvm)
 
 - name: Partition, format, and mount data disks
   import_tasks: create_data_disks.yml
-  when: system_mount_data_disks | default(DEFAULT_SYSTEM_MOUNT_DATA_DISKS)
+  when: system_mount_data_disks | default(default_system_mount_data_disks)
 
 - name: Create user account
   import_tasks: create_system_user.yml
-  when: system_create_user | default(DEFAULT_SYSTEM_CREATE_USER)
+  when: system_create_user | default(default_system_create_user)

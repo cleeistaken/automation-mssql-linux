@@ -13,7 +13,8 @@
 - name: Get IP
   hosts: localhost
   tasks:
-    - set_fact:
+    - name: Set localhost IP
+      set_fact:
         repo_ip: "{{ ansible_default_ipv4.address }}"
 
 #- name: Repo Configuration

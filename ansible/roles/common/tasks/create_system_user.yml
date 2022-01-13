@@ -34,17 +34,17 @@
 
 - name: Validate username is not empty
   ansible.builtin.assert:
-    that: (system_user_username | default(DEFAULT_SYSTEM_USER_USERNAME)) | length >= 3
+    that: (system_user_username | default(default_system_user_username)) | length >= 3
     fail_msg: "'system_user_username' must not be empty and at least 3 characters"
 
 - name: Validate password is not empty
   ansible.builtin.assert:
-    that:  (system_user_password | default(DEFAULT_SYSTEM_USER_PASSWORD)) | length >= 6
+    that:  (system_user_password | default(default_system_user_password)) | length >= 6
     fail_msg: "'system_user_password' must not be empty and at least 6 characters"
 
-- name: "Create user {{ system_user_username | default(DEFAULT_SYSTEM_USER_USERNAME) }}"
+- name: "Create user {{ system_user_username | default(default_system_user_username) }}"
   ansible.builtin.user:
-    name: "{{ system_user_username | default(DEFAULT_SYSTEM_USER_USERNAME) }}"
+    name: "{{ system_user_username | default(default_system_user_username) }}"
     password: "{{ vars.user_password | password_hash('sha512', hash_salt) }}"
     shell: "{{ shell_path }}"
     groups: "{{ sudo_group }}"
@@ -52,7 +52,7 @@
 
 - name: Set authorized key
   ansible.posix.authorized_key:
-    user: "{{ system_user_username | default(DEFAULT_SYSTEM_USER_USERNAME) }}"
+    user: "{{ system_user_username | default(default_system_user_username) }}"
     state: present
     key: "{{ lookup('file', system_user_ssh_key_file) }}"
   when: system_user_ssh_key_file is defined

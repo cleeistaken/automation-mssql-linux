@@ -1,29 +1,29 @@
 ---
 # Packages
-DEFAULT_SYSTEM_UPGRADE_ALL_PACKAGES: false
+default_system_upgrade_all_packages: false
 
 # Hosts file
-DEFAULT_SYSTEM_HOSTS_FILE_CREATE: true
-DEFAULT_SYSTEM_HOSTS_GROUP: "{{ groups['all'] }}"
-DEFAULT_SYSTEM_HOSTS_FILE: /etc/hosts
-DEFAULT_SYSTEM_HOSTS_FILE_DISABLE_ENTRIES: []
+default_system_hosts_file_create: true
+default_system_hosts_group: "{{ groups['all'] }}"
+default_system_hosts_file: /etc/hosts
+default_system_hosts_file_disable_entries: []
 
 # Firewall
-DEFAULT_SYSTEM_FIREWALL_DISABLE: false
+default_system_firewall_disable: false
 
 # Selinux
-DEFAULT_SYSTEM_SELINUX_DISABLE: false
+default_system_selinux_disable: false
 
 # Extend OS LVM
-DEFAULT_SYSTEM_EXTEND_OS_LVM: false
+default_system_extend_os_lvm: false
 
 # Data disks
-DEFAULT_SYSTEM_MOUNT_DATA_DISKS: false
-DEFAULT_SYSTEM_DATA_DISKS_FILESYSTEM: xfs
-DEFAULT_SYSTEM_MOUNT_OPTIONS: noatime
-DEFAULT_SYSTEM_MOUNT_PATHS: ['/mnt/data']
+default_system_mount_data_disks: false
+default_system_mount_data_disks_filesystem: xfs
+default_system_mount_options: noatime
+default_system_mount_paths: ['/mnt/data']
 
 # User parameters
-DEFAULT_SYSTEM_CREATE_USER: false
-DEFAULT_SYSTEM_USER_USERNAME: vmware
-DEFAULT_SYSTEM_USER_PASSWORD: vmware
+default_system_create_user: false
+default_system_user_username: vmware
+default_system_user_password: vmware

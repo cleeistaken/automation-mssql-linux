@@ -1,7 +1,7 @@
 ---
 - name: Check if hosts file exists
   ansible.builtin.stat:
-    path: "{{ system_hosts_file | default(DEFAULT_SYSTEM_HOSTS_FILE) }}"
+    path: "{{ system_hosts_file | default(default_system_hosts_file) }}"
     get_md5: no
   register: stat_hosts_file
 
@@ -10,19 +10,19 @@
     that:
     - stat_hosts_file.stat.exists
     - stat_hosts_file.stat.isreg
-    fail_msg: "Hosts file '{{ system_hosts_file | default(DEFAULT_SYSTEM_HOSTS_FILE) }}' does not appear valid "
+    fail_msg: "Hosts file '{{ system_hosts_file | default(default_system_hosts_file) }}' does not appear valid "
 
 - name: Update hosts file with cluster nodes
-  lineinfile: dest="{{ system_hosts_file | default(DEFAULT_SYSTEM_HOSTS_FILE) }}"
+  lineinfile: dest="{{ system_hosts_file | default(default_system_hosts_file) }}"
     state=present
-    dest="{{ system_hosts_file | default(DEFAULT_SYSTEM_HOSTS_FILE) }}"
+    dest="{{ system_hosts_file | default(default_system_hosts_file) }}"
     regexp='.*{{ item }}$' line="{{ \"%-13s\" | format(hostvars[item].ansible_default_ipv4.address) }}\t{{ hostvars[item].ansible_fqdn }} {{ hostvars[item].ansible_hostname }}"
   when: hostvars[item].ansible_default_ipv4.address is defined
-  loop: "{{ system_hosts_group | default(DEFAULT_SYSTEM_HOSTS_GROUP) }}"
+  loop: "{{ system_hosts_group | default(default_system_hosts_group) }}"
 
 - name: Comment out entries
   replace:
-    dest: "{{ system_hosts_file | default(DEFAULT_SYSTEM_HOSTS_FILE) }}"
+    dest: "{{ system_hosts_file | default(default_system_hosts_file) }}"
     regexp: '^{{item}}'
     replace: '#{{item}}'
-  loop: "{{ system_hosts_file_disable_entries | default(DEFAULT_SYSTEM_HOSTS_FILE_DISABLE_ENTRIES) }}"
+  loop: "{{ system_hosts_file_disable_entries | default(default_system_hosts_file_disable_entries) }}"
