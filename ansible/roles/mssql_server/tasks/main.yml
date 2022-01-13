@@ -1,35 +1,60 @@
 ---
-- name: Set distribution
-  set_fact:
-    is_centos: "{{ ansible_distribution == 'CentOS' }}"
-    is_debian: "{{ ansible_distribution == 'Debian' }}"
-    is_redhat: "{{ ansible_distribution == 'RedHat' }}"
-    is_ubuntu: "{{ ansible_distribution == 'Ubuntu' }}"
+- name: Print distribution
+  ansible.builtin.debug:
+    msg: "The system distribution is: {{ ansible_distribution }}"
 
-- name: Install MSSQL Server CentOS
-  import_tasks: install_mssql_server_centos.yml
-  when: is_centos
+- name: Validate MSSQL EULA
+  ansible.builtin.assert:
+    that:
+      - mssql_accept_eula is define and
+        mssql_accept_eula
+    fail_msg: "Cannot install if the MSSQL EULA is not accepted: 'mssql_accept_eula'"
+    success_msg: "EULA Accepted"
 
-- name: Install MSSQL Server Ubuntu
-  import_tasks: install_mssql_server_ubuntu.yml
-  when: is_ubuntu
+- name: Validate MSSQL PID
+  ansible.builtin.assert:
+    that:
+      - mssql_pid is define and
+        (mssql_pid in ['Evaluation', 'Developer', 'Express', 'Web', 'Standard', 'Enterprise'] or
+         mssql_pid | length > 12)
+    fail_msg: "Cannot install if the MSSQL Product ID is not accepted: 'mssql_pid'"
+    success_msg: "Using MSSQL product id: {{ mssql_pid }}"
+
+- name: Validate PCS VIP
+  ansible.builtin.assert:
+    that:
+      - mssql_pcs_cluster_vip_cidr is defined and 
+        mssql_pcs_cluster_vip_cidr | ipaddr('host/prefix') | length > 0
+    fail_msg: "Cannot install if the PCS Cluster VIP is not configured and valid: 'mssql_pcs_cluster_vip_cidr'"
+    success_msg: "Using MSSQL product id: {{ mssql_pid }}"
+
+
+- name: Install MSSQL Server (CentOS/RedHat)
+  include_tasks: install_mssql_server_centos.yml
+  when: ansible_distribution == 'CentOS' or
+        ansible_distribution == 'RedHat'
+
+- name: Install MSSQL Server (Debian/Ubuntu)
+  include_tasks: install_mssql_server_ubuntu.yml
+  when: ansible_distribution == 'Debian' or
+        ansible_distribution == 'Ubuntu'
 
 - name: Configure MSSQL Server
-  import_tasks: configure_mssql.yml
+  include_tasks: configure_mssql.yml
 
 - name: Generate MSSQL SSL certificate and configure endpoints
-  import_tasks: configure_mssql_ssl_certificates.yml
+  include_tasks: configure_mssql_ssl_certificates.yml
 
 - name: Configure Pacemaker on all nodes
-  import_tasks: configure_pacemaker_all.yml
+  include_tasks: configure_pacemaker_all.yml
 
 - name: Configure Pacemaker on the primary node
-  import_tasks: configure_pacemaker_primary.yml
+  imporinclude_taskst_tasks: configure_pacemaker_primary.yml
   when: inventory_hostname == play_hosts[0]
 
 - name: Configure MSSQL Availability Group
-  import_tasks: configure_mssql_ag.yml
+  include_tasks: configure_mssql_ag.yml
 
 - name: Configure Pacemaker AG resource on the primary node
-  import_tasks: configure_pacemaker_ag.yml
+  include_tasks: configure_pacemaker_ag.yml
   when: inventory_hostname == play_hosts[0]

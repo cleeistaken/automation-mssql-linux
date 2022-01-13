@@ -34,32 +34,32 @@
 - name: Set user hacluster user password
   user:
     name: hacluster
-    password: "{{ HACLUSTER_PASSWORD | password_hash('sha512') }}"
+    password: "{{ (mssql_hacluster_password | default(default_mssql_hacluster_password)) | password_hash('sha512') }}"
 
 #
 # Create Pacemaker User
 #
 # https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-create-availability-group?view=sql-server-ver15
-- name: "Create MSSQL user {{ SQL_Pace_USER }} for Pacemaker"
+- name: "Create MSSQL user {{ mssql_pacemaker_username | default(default_mssql_pacemaker_username) }} for Pacemaker"
   ansible.builtin.command: >
     {{ mssql_tools_bin_path }}/sqlcmd 
     -s localhost 
     -U SA 
-    -P "{{ MSSQL_SA_PASSWORD }}"
-    -Q "IF NOT EXISTS (SELECT name FROM master.sys.server_principals WHERE name = '{{ SQL_Pace_USER }}') BEGIN CREATE LOGIN [{{ SQL_Pace_USER }}] with PASSWORD = N'{{ SQL_Pace_USER_PASSWORD }}' END; ALTER SERVER ROLE [sysadmin] ADD MEMBER [{{ SQL_Pace_USER }}];"
+    -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
+    -Q "IF NOT EXISTS (SELECT name FROM master.sys.server_principals WHERE name = '{{ mssql_pacemaker_username | default(default_mssql_pacemaker_username) }}') BEGIN CREATE LOGIN [{{ mssql_pacemaker_username | default(default_mssql_pacemaker_username) }}] with PASSWORD = N'{{ mssql_pacemaker_password | default(default_mssql_pacemaker_password) }}' END; ALTER SERVER ROLE [sysadmin] ADD MEMBER [{{ mssql_pacemaker_username | default(default_mssql_pacemaker_username) }}];"
   register: result
 
 - name: Print command output
   ansible.builtin.debug:
     var: result.stdout
 
-#- name: "Grant permissions to user {{ SQL_Pace_USER }} on Availability Group {{ MSSQL_AG_NAME }}"
+#- name: "Grant permissions to user {{ mssql_pacemaker_username | default(default_mssql_pacemaker_username) }} on Availability Group {{ mssql_ag_name | default(default_mssql_ag_name) }}"
 #  ansible.builtin.command: >
 #    {{ mssql_tools_bin_path }}/sqlcmd 
 #    -s localhost 
 #    -U SA 
-#    -P "{{ MSSQL_SA_PASSWORD }}"
-#    -Q "GRANT ALTER, CONTROL, VIEW DEFINITION ON AVAILABILITY GROUP::{{ MSSQL_AG_NAME }} TO {{ SQL_Pace_USER }}; GRANT VIEW SERVER STATE TO {{ SQL_Pace_USER }};"
+#    -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
+#    -Q "GRANT ALTER, CONTROL, VIEW DEFINITION ON AVAILABILITY GROUP::{{ mssql_ag_name | default(default_mssql_ag_name) }} TO {{ mssql_pacemaker_username | default(default_mssql_pacemaker_username) }}; GRANT VIEW SERVER STATE TO {{ mssql_pacemaker_username | default(default_mssql_pacemaker_username) }};"
 #  register: result
 
 - name: Print command output
@@ -73,5 +73,5 @@
     owner: root
     group: root
     content: |
-      {{ SQL_Pace_USER }}
-      {{ SQL_Pace_USER_PASSWORD }}
+      {{ mssql_pacemaker_username | default(default_mssql_pacemaker_username) }}
+      {{ mssql_pacemaker_password | default(default_mssql_pacemaker_password) }}

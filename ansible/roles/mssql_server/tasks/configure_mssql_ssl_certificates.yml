@@ -12,8 +12,8 @@
     {{ mssql_tools_bin_path }}/sqlcmd 
     -s localhost 
     -U SA 
-    -P "{{ MSSQL_SA_PASSWORD }}"
-    -Q "IF NOT EXISTS (SELECT name FROM sys.symmetric_keys WHERE name LIKE '%DatabaseMasterKey%') BEGIN CREATE MASTER KEY ENCRYPTION BY PASSWORD = '{{ MSSQL_SA_PASSWORD }}' END;"
+    -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
+    -Q "IF NOT EXISTS (SELECT name FROM sys.symmetric_keys WHERE name LIKE '%DatabaseMasterKey%') BEGIN CREATE MASTER KEY ENCRYPTION BY PASSWORD = '{{ mssql_sa_password | default(default_mssql_sa_password) }}' END;"
   register: result
 
 - name: Validate the master key was created successfully
@@ -27,7 +27,7 @@
     {{ mssql_tools_bin_path }}/sqlcmd 
     -s localhost 
     -U SA 
-    -P "{{ MSSQL_SA_PASSWORD }}"
+    -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
     -Q "IF NOT EXISTS (SELECT name FROM sys.certificates WHERE name = '{{ ansible_hostname_sanitized }}_cert') BEGIN CREATE CERTIFICATE {{ ansible_hostname_sanitized }}_cert WITH SUBJECT = '{{ ansible_hostname }} AG Certificate' END;"
   register: result
 
@@ -39,7 +39,7 @@
 
 - name: Delete previous certificate backup
   ansible.builtin.file:
-    path: "{{ mssql_cert_folder | default(default_mssql_cert_folder) }}/{{ ansible_hostname_sanitized }}_cert.cer"
+    path: "{{ mssql_directory_cert | default(default_mssql_directory_cert) }}/{{ ansible_hostname_sanitized }}_cert.cer"
     state: absent
 
 - name: Backup certificate
@@ -47,13 +47,13 @@
     {{ mssql_tools_bin_path }}/sqlcmd 
     -s localhost 
     -U SA 
-    -P "{{ MSSQL_SA_PASSWORD }}"
-    -Q "BACKUP CERTIFICATE {{ ansible_hostname_sanitized }}_cert TO FILE = '{{ mssql_cert_folder | default(default_mssql_cert_folder) }}/{{ ansible_hostname_sanitized }}_cert.cer';"
+    -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
+    -Q "BACKUP CERTIFICATE {{ ansible_hostname_sanitized }}_cert TO FILE = '{{ mssql_directory_cert | default(default_mssql_directory_cert) }}/{{ ansible_hostname_sanitized }}_cert.cer';"
   register: result
 
 - name: Stat backup file
   ansible.builtin.stat:
-    path: "{{ mssql_cert_folder | default(default_mssql_cert_folder) }}/{{ ansible_hostname_sanitized }}_cert.cer"
+    path: "{{ mssql_directory_cert | default(default_mssql_directory_cert) }}/{{ ansible_hostname_sanitized }}_cert.cer"
     get_checksum: no
   register: file_stat
 
@@ -63,33 +63,33 @@
       - result.stdout | length == 0
       - file_stat.stat.exists
     fail_msg: "{{ result.stdout }}"
-    success_msg: "Certificate {{ ansible_hostname_sanitized }}_cert backed up to {{ mssql_cert_folder | default(default_mssql_cert_folder) }}/{{ ansible_hostname_sanitized }}_cert.cer"
+    success_msg: "Certificate {{ ansible_hostname_sanitized }}_cert backed up to {{ mssql_directory_cert | default(default_mssql_directory_cert) }}/{{ ansible_hostname_sanitized }}_cert.cer"
 
-- name: "Create endpoint {{ mssql_endpoint | default(default_mssql_endpoint) }} with listener on port {{ mssql_listener_port | default(default_mssql_listener_port) }}"
+- name: "Create endpoint {{ mssql_ag_endpoint | default(default_mssql_ag_endpoint) }} with listener on port {{ mssql_endpoint_listener_port | default(default_mssql_endpoint_listener_port) }}"
   ansible.builtin.command: >
     {{ mssql_tools_bin_path }}/sqlcmd 
     -s localhost 
     -U SA 
-    -P "{{ MSSQL_SA_PASSWORD }}"
-    -Q "IF NOT EXISTS (SELECT name FROM sys.endpoints WHERE name LIKE '{{ mssql_endpoint | default(default_mssql_endpoint) }}') BEGIN CREATE ENDPOINT {{ mssql_endpoint | default(default_mssql_endpoint) }} STATE = STARTED AS TCP (LISTENER_PORT = {{ mssql_listener_port | default(default_mssql_listener_port) }}, LISTENER_IP = ALL) FOR DATABASE_MIRRORING (AUTHENTICATION = CERTIFICATE {{ ansible_hostname_sanitized }}_cert, ROLE = ALL) END;"
+    -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
+    -Q "IF NOT EXISTS (SELECT name FROM sys.endpoints WHERE name LIKE '{{ mssql_ag_endpoint | default(default_mssql_ag_endpoint) }}') BEGIN CREATE ENDPOINT {{ mssql_endpoint | default(default_mssql_endpoint) }} STATE = STARTED AS TCP (LISTENER_PORT = {{ mssql_endpoint_listener_port | default(default_mssql_endpoint_listener_port) }}, LISTENER_IP = ALL) FOR DATABASE_MIRRORING (AUTHENTICATION = CERTIFICATE {{ ansible_hostname_sanitized }}_cert, ROLE = ALL) END;"
   register: result
 
 - name: Validate the endpoint was created successfully
   ansible.builtin.assert:
     that: result.stdout | length == 0
     fail_msg: "{{ result.stdout }}"
-    success_msg: "Endpoint {{ mssql_endpoint | default(default_mssql_endpoint) }} created successfully"
+    success_msg: "Endpoint {{ mssql_ag_endpoint | default(default_mssql_ag_endpoint) }} created successfully"
 
 - name: Fetch generated certificates
   ansible.builtin.fetch:
-    src: "{{ mssql_cert_folder | default(default_mssql_cert_folder) }}/{{ ansible_hostname_sanitized }}_cert.cer"
+    src: "{{ mssql_directory_cert | default(default_mssql_directory_cert) }}/{{ ansible_hostname_sanitized }}_cert.cer"
     dest: "{{ playbook_dir }}/../config/"
     flat: yes
 
 - name: Copy newly generated SSL certificates to other hosts
   ansible.builtin.copy:
     src: "/opt/automation/automation-mssql-linux/config/{{ item }}_cert.cer"
-    dest: "{{ mssql_cert_folder | default(default_mssql_cert_folder) }}/{{ item }}_cert.cer"
+    dest: "{{ mssql_directory_cert | default(default_mssql_directory_cert) }}/{{ item }}_cert.cer"
     owner: mssql
     group: mssql
     mode: '660'
@@ -100,8 +100,8 @@
     {{ mssql_tools_bin_path }}/sqlcmd
     -s localhost
     -U SA
-    -P "{{ MSSQL_SA_PASSWORD }}"
-    -Q "IF NOT EXISTS (SELECT name FROM master.sys.server_principals WHERE name = '{{ item }}_login') BEGIN CREATE LOGIN {{ item }}_login WITH PASSWORD = N'{{ MSSQL_SA_PASSWORD }}' END;"
+    -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
+    -Q "IF NOT EXISTS (SELECT name FROM master.sys.server_principals WHERE name = '{{ item }}_login') BEGIN CREATE LOGIN {{ item }}_login WITH PASSWORD = N'{{ mssql_sa_password | default(default_mssql_sa_password) }}' END;"
   register: result
   when:
     - item != ansible_hostname_sanitized
@@ -112,7 +112,7 @@
     {{ mssql_tools_bin_path }}/sqlcmd
     -s localhost
     -U SA
-    -P "{{ MSSQL_SA_PASSWORD }}"
+    -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
     -Q "IF NOT EXISTS (SELECT name FROM sys.database_principals WHERE name = '{{ item }}_user') BEGIN CREATE USER {{ item }}_user FOR LOGIN {{ item }}_login END;"
   register: result
   when:
@@ -124,8 +124,8 @@
     {{ mssql_tools_bin_path }}/sqlcmd
     -s localhost
     -U SA
-    -P "{{ MSSQL_SA_PASSWORD }}"
-    -Q "IF NOT EXISTS (SELECT name FROM sys.certificates WHERE name = '{{ item }}_cert') BEGIN CREATE CERTIFICATE {{ item }}_cert AUTHORIZATION {{ item }}_user FROM FILE = '{{ mssql_cert_folder | default(default_mssql_cert_folder) }}/{{ item }}_cert.cer' END;"
+    -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
+    -Q "IF NOT EXISTS (SELECT name FROM sys.certificates WHERE name = '{{ item }}_cert') BEGIN CREATE CERTIFICATE {{ item }}_cert AUTHORIZATION {{ item }}_user FROM FILE = '{{ mssql_directory_cert | default(default_mssql_directory_cert) }}/{{ item }}_cert.cer' END;"
   register: result
   when:
   - item != ansible_hostname_sanitized
@@ -136,8 +136,8 @@
     {{ mssql_tools_bin_path }}/sqlcmd
     -s localhost
     -U SA
-    -P "{{ MSSQL_SA_PASSWORD }}"
-    -Q "GRANT CONNECT ON ENDPOINT::{{ mssql_endpoint | default(default_mssql_endpoint) }} TO {{ item }}_login;"
+    -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
+    -Q "GRANT CONNECT ON ENDPOINT::{{ mssql_ag_endpoint | default(default_mssql_ag_endpoint) }} TO {{ item }}_login;"
   register: result
   when:
   - item != ansible_hostname_sanitized

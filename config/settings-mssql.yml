@@ -3,7 +3,8 @@ all:
   vars:
     #
     # Role: Common
-    #
+    # -------------------------------------------------------------------------
+
     # Host packages
     # Upgrade all the system packages.
     system_upgrade_all_packages: true
@@ -40,71 +41,95 @@ all:
 
     #
     # Role: MSSQL Server
-    #
-    # https://dba.stackexchange.com/questions/216955/listing-the-microsoft-sql-server-configuration-with-the-values-set-by-mssql-conf
+    # -------------------------------------------------------------------------
 
-    MSSQL_PORT: 1433
+    # Mandatory Parameters
+    # These must be configured
+
+    # Set the SQL Server edition or product key. Possible values include:
+    #  - Evaluation
+    #  - Developer
+    #  - Express
+    #  - Web
+    #  - Standard
+    #  - Enterprise
+    #  - A product key
+    # Ref. https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-configure-environment-variables?view=sql-server-ver15
+    mssql_pid: enterprise
+
+    # Accept the EULA confirm your acceptance of the End-User Licensing Agreement.
+    # Required setting for the SQL Server image.
+    # Ref. https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-configure-environment-variables?view=sql-server-ver15
+    mssql_accept_eula: true
+
+    # The Virtual IP for the MSSQL AG
+    # This should an address in CIDR format on the same subnet at the MSSQL servers
+    # '<ip>/<prefix>
+    mssql_pcs_cluster_vip_cidr: '172.16.20.221/23'
+
+    # Accounts
+    #mssql_sa_password: vmware
+    #mssql_install_user_username: vmware
+    #mssql_install_user_password: VMware1!
+    #mssql_hacluster_password: VMware1!
+    #mssql_pacemaker_username: paceuser
+    #mssql_pacemaker_password: pacepass
+
+    # Components
+    #mssql_install_agent: true
+    #mssql_install_ha: true
+    #mssql_install_fulltext: true
+    #mssql_install_intg_svc: true
+    #mssql_install_ext: true # Todo
+    #mssql_install_ha_pacemaker: true # Todo
+
+    # Network
+    #mssql_port: 1433
 
     # MSSQL server directories
-    MSSQL_DIRECTORY_DATA: '/sqlnux/data'
-    MSSQL_DIRECTORY_LOG: '/sqlnux/log'
-    MSSQL_DIRECTORY_BACKUP: '/sqlnux/backup'
-    MSSQL_DIRECTORY_DUMP: '/sqlnux/dump'
-    MSSQL_DIRECTORY_AUDIT: '/sqlnux/audit'
-    MSSQL_DIRECTORY_ERRORLOGS: '/sqlnux/errorlogs'
+    #mssql_directory_data: /sqlnux/data
+    #mssql_directory_log: /sqlnux/log
+    #mssql_directory_backup: /sqlnux/backup
+    #mssql_directory_dump: /sqlnux/dump
+    #mssql_directory_audit: /sqlnux/audit
+    #mssql_directory_errorlogs: /sqlnux/errorlogs
+    #mssql_directory_cert: /var/opt/mssql/data
+    #mssql_error_log_filename: errorlog
+    #mssql_telemetry_user_requested_local_audit_directory: /sqlnux/audit
 
     # Directory owner, group, and permissions
-    #MSSQL_DIRECTORY_USER: mssql
-    #MSSQL_DIRECTORY_GROUP: mssql
-    #MSSQL_DIRECTORY_MODE: '0755''
+    #mssql_directory_user: mssql
+    #mssql_directory_group: mssql
+    #mssql_directory_mode: '0755'
 
-    # Error logfile name
-    #MSSQL_ERROR_LOG_FILENAME: 'errorlog'
-
-    # Core dump type to capture
+    # MSSQL core dump
     # values: mini, miniplus, filtered, full
-    #SQL_COREDUMP_TYPE: 'full'
+    #mssql_coredump_type: 'full'
 
-    SQL_INSTALL_AGENT: N
+    # MSSQL Agent
+    #mssql_install_agent_enable: true
+    #mssql_install_agent_error_log_file: /sqlnux/errorlogs
 
-    SQL_AGENT_ENABLE: true
-    SQL_AGENT_ERROR_LOG_FILE: /sqlnux/errorlogs
-
-    SQL_TELEMETRY_CUSTOMER_FEEDBACK: false
-    SQL_TELEMETRY_USER_REQUESTED_LOCAL_AUDIT_DIRECTORY: /sqlnux/audit
-
-
-    # SQL Agent logging levels are bitmask values that equal:
+    # SQL Agent logging level
+    # The level is a bitmask with values that equal:
     #    1 = Errors
     #    2 = Warnings
     #    4 = Info
     # If you want to capture all levels, use 7 as the value.
-    SQL_AGENT_ERROR_LOGGING_LEVEL: 7
+    #mssql_agent_logging_level: 7
 
-    SQL_INSTALL_HA: Y
-    SQL_INSTALL_FULLTEXT: Y
-    SQL_INSTALL_INTG_SVC: N
-    SQL_INSTALL_EXT: Y
-    SQL_INSTALL_HA_Pace: Y
-    SQL_INSTALL_USER: vmware
-    SQL_INSTALL_USER_PASSWORD: VMware1!
-    SQL_Pace_USER: pacesqlnux
-    SQL_Pace_USER_PASSWORD: cashc0wBunG@!
-    ACCEPT_EULA: Y
-    MSSQL_SA_PASSWORD: cashc0wBunG@!
-    MSSQL_PID: enterprise
-    HACLUSTER_PASSWORD: P@ssw0rd
+    # MSSQL Trace Flags
+    #mssql_trace_flags: ['1204', '1222']
 
-    # https://docs.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-traceon-trace-flags-transact-sql?view=sql-server-ver15
-    MSSQL_TRACE_FLAGS:
-      - 1204
-      - 1222
+    # Telemetry
+    #mssql_telemetry_customer_feedback: false
 
-    PCS_CLUSTER_VIP_CIDR: '172.16.20.221/23'
+    # MSSQL AG
+    #mssql_ag_name: ag1
+    #mssql_ag_db_name: db1
+    #mssql_ag_endpoint: hadr_endpoint1
 
-    MSSQL_AG_NAME: 'ag1'
-
-    MSSQL_AG_DB_NAME: 'db1'
-
-    PCS_FENCE_NAME: vmw_sql_fence
-    PCS_RESOURCE_VIP_NAME: virtualip1
+    # MSSQL PCS
+    #mssql_pcs_cluster_name: pcscluster1
+    #mssql_pcs_resource_vip_name: vip1
+    #mssql_pcs_fence_name: vmw_fence1

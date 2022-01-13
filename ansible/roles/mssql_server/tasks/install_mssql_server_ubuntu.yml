@@ -43,8 +43,8 @@
 - name: Accept MSSQL EULA
   ansible.builtin.command: "{{ mssql_bin_path }}/mssql-conf -n setup accept-eula"
   environment:
-    MSSQL_SA_PASSWORD: "{{ vars.MSSQL_SA_PASSWORD }}"
-    MSSQL_PID: "{{ vars.MSSQL_PID }}"
+    MSSQL_SA_PASSWORD: "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
+    MSSQL_PID: "{{ mssql_pid }}"
 
 - name: Start and enable MSSQL Server
   ansible.builtin.service:
@@ -71,7 +71,7 @@
   retries: 60
   until: apt_action is success or ('Failed to lock apt for exclusive operation' not in apt_action.msg and '/var/lib/dpkg/lock' not in apt_action.msg)
   environment:
-    ACCEPT_EULA: "{{ vars.ACCEPT_EULA }}"
+    ACCEPT_EULA: "{{ 'Y' if mssql_accept_eula else 'N' }}"
 
 - name: "Add {{ mssql_bin_path }} to path"
   ansible.builtin.lineinfile: >
@@ -100,7 +100,7 @@
   delay: 5
   retries: 60
   until: apt_action is success or ('Failed to lock apt for exclusive operation' not in apt_action.msg and '/var/lib/dpkg/lock' not in apt_action.msg)
-  when: vars.SQL_INSTALL_AGENT|upper == 'Y'
+  when: mssql_install_agent | default(default_mssql_install_agent)
 
 # re: apt upgrade full raises a "Could not get lock /var/lib/dpkg/lock-frontend"
 # https://github.com/ansible/ansible/issues/51663
@@ -113,7 +113,7 @@
   delay: 5
   retries: 60
   until: apt_action is success or ('Failed to lock apt for exclusive operation' not in apt_action.msg and '/var/lib/dpkg/lock' not in apt_action.msg)
-  when: vars.SQL_INSTALL_HA|upper == 'Y'
+  when: mssql_install_ha | default(default_mssql_install_ha)
 
 # re: apt upgrade full raises a "Could not get lock /var/lib/dpkg/lock-frontend"
 # https://github.com/ansible/ansible/issues/51663
@@ -126,7 +126,7 @@
   delay: 5
   retries: 60
   until: apt_action is success or ('Failed to lock apt for exclusive operation' not in apt_action.msg and '/var/lib/dpkg/lock' not in apt_action.msg)
-  when: vars.SQL_INSTALL_FULLTEXT|upper == 'Y'
+  when: mssql_install_fulltext | default(default_mssql_install_fulltext)
 
 # re: apt upgrade full raises a "Could not get lock /var/lib/dpkg/lock-frontend"
 # https://github.com/ansible/ansible/issues/51663
@@ -139,13 +139,13 @@
   delay: 5
   retries: 60
   until: apt_action is success or ('Failed to lock apt for exclusive operation' not in apt_action.msg and '/var/lib/dpkg/lock' not in apt_action.msg)
-  when: vars.SQL_INSTALL_INTG_SVC|upper == 'Y'
+  when: mssql_install_intg_svc | default(default_mssql_install_intg_svc)
 
 - name: Restart the MSSQL Server
   import_tasks: restart_mssql_server.yml
 
 - name: Get MSSQL version
-  ansible.builtin.command: "{{ mssql_tools_bin_path }}/sqlcmd -S localhost -U SA -P '{{ vars.MSSQL_SA_PASSWORD }}' -Q \"SELECT @@VERSION\""
+  ansible.builtin.command: "{{ mssql_tools_bin_path }}/sqlcmd -S localhost -U SA -P '{{ mssql_sa_password | default(default_mssql_sa_password) }}' -Q \"SELECT @@VERSION\""
   retries: 5
   delay: 3
   register: result

@@ -19,11 +19,11 @@
 #
 - name: Create pcs ag cluster name
   set_fact:
-    ag_cluster: "{{ MSSQL_AG_NAME }}_cluster"
+    ag_cluster: "{{ mssql_ag_name | default(default_mssql_ag_name) }}_cluster"
 
 - name: Create AG cluster resource
   ansible.builtin.command: >
-    pcs resource create {{ ag_cluster }} ocf:mssql:ag ag_name={{ MSSQL_AG_NAME }} meta failure-timeout=30s promotable notify=true
+    pcs resource create {{ mssql_ag_name | default(default_mssql_ag_name) }} ocf:mssql:ag ag_name={{ mssql_ag_name | default(default_mssql_ag_name) }} meta failure-timeout=30s promotable notify=true
 
 - name: Output
   ansible.builtin.debug:
@@ -31,7 +31,7 @@
 
 - name: Add pcs constraint colocation
   ansible.builtin.command:  >
-    pcs constraint colocation add {{ PCS_RESOURCE_VIP_NAME | default(default_pcs_resource_vip_name) }} with master {{ ag_cluster }}-clone INFINITY
+    pcs constraint colocation add {{ pcs_resource_vip_name | default(default_pcs_resource_vip_name) }} with master {{ ag_cluster }}-clone INFINITY
   register: result
 
 - name: Output
@@ -49,7 +49,7 @@
 
 - name: Add pcs constraint ordering
   ansible.builtin.command: >
-    pcs constraint order promote {{ ag_cluster }}-clone then start {{ PCS_RESOURCE_VIP_NAME | default(default_pcs_resource_vip_name) }}
+    pcs constraint order promote {{ ag_cluster }}-clone then start {{ pcs_resource_vip_name | default(default_pcs_resource_vip_name) }}
   register: result
 
 - name: Output
@@ -68,7 +68,7 @@
 #
 # PCS Resource Cleanup
 #
-- name: "Run pcs resource cleanup on {{ MSSQL_AG_NAME }}"
+- name: "Run pcs resource cleanup on {{ mssql_ag_name | default(default_mssql_ag_name) }}"
   ansible.builtin.command: >
     pcs resource cleanup {{ ag_cluster }}
   register: result
@@ -83,7 +83,7 @@
 #
 - name: Create fence using fence_vmware_soap
   ansible.builtin.command: >
-    pcs stonith create {{ PCS_FENCE_NAME | default(default_pcs_fence_name) }} 
+    pcs stonith create {{ pcs_fence_name | default(default_pcs_fence_name) }} 
     fence_vmware_soap pcmk_host_map="{{ pcs_mappings | join(';')   }}" 
     ipaddr={{ vars.vcenter.host }} 
     ssl=1 

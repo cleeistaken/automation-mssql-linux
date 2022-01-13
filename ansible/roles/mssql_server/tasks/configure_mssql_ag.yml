@@ -36,7 +36,7 @@
     {{ mssql_tools_bin_path }}/sqlcmd 
     -s localhost 
     -U SA 
-    -P "{{ MSSQL_SA_PASSWORD }}"
+    -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
     -Q "ALTER EVENT SESSION AlwaysOn_health ON SERVER WITH (STARTUP_STATE=ON);"
   register: result
 
@@ -50,7 +50,7 @@
 - name: Build node parameters
   set_fact:
     ag_node_parameters: >
-      {{ ag_node_parameters | default("") }}N'{{ item.0 }}' WITH (ENDPOINT_URL = N'tcp://{{ item.1 }}:{{ mssql_listener_port | default(default_mssql_listener_port) }}', AVAILABILITY_MODE = SYNCHRONOUS_COMMIT, FAILOVER_MODE = EXTERNAL, SEEDING_MODE = AUTOMATIC)
+      {{ ag_node_parameters | default("") }}N'{{ item.0 }}' WITH (ENDPOINT_URL = N'tcp://{{ item.1 }}:{{ mssql_endpoint_listener_port | default(default_mssql_endpoint_listener_port) }}', AVAILABILITY_MODE = SYNCHRONOUS_COMMIT, FAILOVER_MODE = EXTERNAL, SEEDING_MODE = AUTOMATIC)
   with_together:
     - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'ansible_hostname') | list }}"
     - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'ansible_fqdn') | list }}"
@@ -61,8 +61,8 @@
     {{ mssql_tools_bin_path }}/sqlcmd 
     -s localhost 
     -U SA 
-    -P "{{ MSSQL_SA_PASSWORD }}"
-    -Q "IF NOT EXISTS (SELECT name FROM master.sys.availability_groups WHERE name = '{{ MSSQL_AG_NAME }}') BEGIN CREATE AVAILABILITY GROUP [{{ MSSQL_AG_NAME }}] WITH (DB_FAILOVER = ON, CLUSTER_TYPE = EXTERNAL) FOR REPLICA ON {{  ag_node_parameters.splitlines() | join(',') }}; ALTER AVAILABILITY GROUP [{{ MSSQL_AG_NAME }}] GRANT CREATE ANY DATABASE END;"
+    -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
+    -Q "IF NOT EXISTS (SELECT name FROM master.sys.availability_groups WHERE name = '{{ mssql_ag_name | default(default_mssql_ag_name) }}') BEGIN CREATE AVAILABILITY GROUP [{{ mssql_ag_name | default(default_mssql_ag_name) }}] WITH (DB_FAILOVER = ON, CLUSTER_TYPE = EXTERNAL) FOR REPLICA ON {{  ag_node_parameters.splitlines() | join(',') }}; ALTER AVAILABILITY GROUP [{{ mssql_ag_name | default(default_mssql_ag_name) }}] GRANT CREATE ANY DATABASE END;"
   register: result
   when: inventory_hostname == play_hosts[0]
 
@@ -78,8 +78,8 @@
     {{ mssql_tools_bin_path }}/sqlcmd 
     -s localhost 
     -U SA 
-    -P "{{ MSSQL_SA_PASSWORD }}"
-    -Q "IF NOT EXISTS (SELECT name FROM master.sys.availability_groups WHERE name = '{{ MSSQL_AG_NAME }}') BEGIN ALTER AVAILABILITY GROUP [{{ MSSQL_AG_NAME }}] JOIN WITH (CLUSTER_TYPE = EXTERNAL); ALTER AVAILABILITY GROUP [{{ MSSQL_AG_NAME }}] GRANT CREATE ANY DATABASE END;"
+    -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
+    -Q "IF NOT EXISTS (SELECT name FROM master.sys.availability_groups WHERE name = '{{ mssql_ag_name | default(default_mssql_ag_name) }}') BEGIN ALTER AVAILABILITY GROUP [{{ mssql_ag_name | default(default_mssql_ag_name) }}] JOIN WITH (CLUSTER_TYPE = EXTERNAL); ALTER AVAILABILITY GROUP [{{ mssql_ag_name | default(default_mssql_ag_name) }}] GRANT CREATE ANY DATABASE END;"
   register: result
   when: inventory_hostname != play_hosts[0]
 
@@ -90,13 +90,13 @@
 #
 # Grant permission to pacemaker user
 # 
-- name: "Grant permissions to user {{ SQL_Pace_USER }} on Availability Group {{ MSSQL_AG_NAME }}"
+- name: "Grant permissions to user {{ mssql_pacemaker_username | default(default_mssql_pacemaker_username) }} on Availability Group {{ mssql_ag_name | default(default_mssql_ag_name) }}"
   ansible.builtin.command: >
     {{ mssql_tools_bin_path }}/sqlcmd 
     -s localhost 
     -U SA 
-    -P "{{ MSSQL_SA_PASSWORD }}"
-    -Q "GRANT ALTER, CONTROL, VIEW DEFINITION ON AVAILABILITY GROUP::{{ MSSQL_AG_NAME }} TO {{ SQL_Pace_USER }}; GRANT VIEW SERVER STATE TO {{ SQL_Pace_USER }};"
+    -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
+    -Q "GRANT ALTER, CONTROL, VIEW DEFINITION ON AVAILABILITY GROUP::{{ mssql_ag_name | default(default_mssql_ag_name) }} TO {{ mssql_pacemaker_username | default(default_mssql_pacemaker_username) }}; GRANT VIEW SERVER STATE TO {{ mssql_pacemaker_username | default(default_mssql_pacemaker_username) }};"
   register: result
 
 - name: Print command output
@@ -106,13 +106,13 @@
 #
 # Create Database
 #
-- name: "Create database {{ MSSQL_AG_DB_NAME }}"
+- name: "Create database {{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}"
   ansible.builtin.command: >
     {{ mssql_tools_bin_path }}/sqlcmd 
     -s localhost 
     -U SA 
-    -P "{{ MSSQL_SA_PASSWORD }}"
-    -Q "IF NOT EXISTS (SELECT name from master.sys.databases WHERE name = '{{ MSSQL_AG_DB_NAME }}') BEGIN CREATE DATABASE [{{ MSSQL_AG_DB_NAME }}]; ALTER DATABASE [{{ MSSQL_AG_DB_NAME }}] SET RECOVERY FULL END;"
+    -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
+    -Q "IF NOT EXISTS (SELECT name from master.sys.databases WHERE name = '{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}') BEGIN CREATE DATABASE [{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}]; ALTER DATABASE [{{ MSSQL_AG_DB_NAME }}] SET RECOVERY FULL END;"
   register: result
   when: inventory_hostname == play_hosts[0]
 
@@ -125,17 +125,17 @@
 #
 - name: Delete previous database backup
   ansible.builtin.file:
-    path: "{{ MSSQL_DIRECTORY_BACKUP }}/{{ MSSQL_AG_DB_NAME }}.bak"
+    path: "{{ MSSQL_DIRECTORY_BACKUP }}/{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}.bak"
     state: absent
   when: inventory_hostname == play_hosts[0]
 
-- name: "Backup database {{ MSSQL_AG_DB_NAME }} to {{ MSSQL_DIRECTORY_BACKUP }}/{{ MSSQL_AG_DB_NAME }}.bak"
+- name: "Backup database {{ mssql_ag_db_name | default(default_mssql_ag_db_name) }} to {{ MSSQL_DIRECTORY_BACKUP }}/{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}.bak"
   ansible.builtin.command: >
     {{ mssql_tools_bin_path }}/sqlcmd 
     -s localhost 
     -U SA 
-    -P "{{ MSSQL_SA_PASSWORD }}"
-    -Q "BACKUP DATABASE [{{ MSSQL_AG_DB_NAME }}] TO DISK = N'{{ MSSQL_DIRECTORY_BACKUP }}/{{ MSSQL_AG_DB_NAME }}.bak'"
+    -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
+    -Q "BACKUP DATABASE [{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}] TO DISK = N'{{ MSSQL_DIRECTORY_BACKUP }}/{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}.bak'"
   register: result
   when: inventory_hostname == play_hosts[0]
 
@@ -146,13 +146,13 @@
 #
 # Add Database to Availability Group
 #
-- name: "Add database {{ MSSQL_AG_DB_NAME }} to availability group {{ MSSQL_AG_NAME }}"
+- name: "Add database {{ mssql_ag_db_name | default(default_mssql_ag_db_name) }} to availability group {{ mssql_ag_name | default(default_mssql_ag_name) }}"
   ansible.builtin.command: >
     {{ mssql_tools_bin_path }}/sqlcmd 
     -s localhost 
     -U SA 
-    -P "{{ MSSQL_SA_PASSWORD }}"
-    -Q "IF NOT EXISTS (SELECT AGDatabases.database_name AS name FROM sys.dm_hadr_availability_group_states States INNER JOIN master.sys.availability_groups Groups ON States.group_id = Groups.group_id INNER JOIN sys.availability_databases_cluster AGDatabases ON Groups.group_id = AGDatabases.group_id WHERE primary_replica = @@Servername AND AGDatabases.database_name = '{{ MSSQL_AG_DB_NAME }}') BEGIN ALTER AVAILABILITY GROUP [{{ MSSQL_AG_NAME }}] ADD DATABASE [{{ MSSQL_AG_DB_NAME }}] END;"
+    -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
+    -Q "IF NOT EXISTS (SELECT AGDatabases.database_name AS name FROM sys.dm_hadr_availability_group_states States INNER JOIN master.sys.availability_groups Groups ON States.group_id = Groups.group_id INNER JOIN sys.availability_databases_cluster AGDatabases ON Groups.group_id = AGDatabases.group_id WHERE primary_replica = @@Servername AND AGDatabases.database_name = '{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}') BEGIN ALTER AVAILABILITY GROUP [{{ mssql_ag_name | default(default_mssql_ag_name) }}] ADD DATABASE [{{ MSSQL_AG_DB_NAME }}] END;"
   register: result
   when: inventory_hostname == play_hosts[0]
 

@@ -10,7 +10,7 @@
 
 - name: Authenticate pacemaker nodes
   ansible.builtin.command: >
-    pcs host -u hacluster -p {{ HACLUSTER_PASSWORD }} auth {{ pcs_fqdn | join(' ') }}
+    pcs host -u hacluster -p {{ (mssql_hacluster_password | default(default_mssql_hacluster_password) }} auth {{ pcs_fqdn | join(' ') }}
   register: result
 
 - name: Output
@@ -33,7 +33,7 @@
 
 - name: Create and start cluster
   ansible.builtin.command: >
-    pcs cluster setup {{ pcs_cluster_name | default(default_pcs_cluster_name) }} {{ pcs_host_addrs | join(' ') }} --start --enable
+    pcs cluster setup {{ mssql_pcs_cluster_name | default(default_mssql_pcs_cluster_name) }} {{ pcs_host_addrs | join(' ') }} --start --enable
   register: result
   when: not cluster_running
 
@@ -79,9 +79,9 @@
   ansible.builtin.debug:
     var: result.stdout
 
-- name: "Create PCS IP resource {{ PCS_RESOURCE_VIP_NAME | default(default_pcs_resource_vip_name) }} with IP {{ PCS_CLUSTER_VIP_CIDR | ansible.netcommon.ipaddr('address') }}"
+- name: "Create PCS IP resource {{ pcs_resource_vip_name | default(default_pcs_resource_vip_name) }} with IP {{ mssql_pcs_cluster_vip_cidr | ansible.netcommon.ipaddr('address') }}"
   ansible.builtin.command: >
-    pcs resource create {{ PCS_RESOURCE_VIP_NAME | default(default_pcs_resource_vip_name) }} ocf:heartbeat:IPaddr2 ip={{ PCS_CLUSTER_VIP_CIDR | ansible.netcommon.ipaddr('address') }} cidr_netmask={{ PCS_CLUSTER_VIP_CIDR | ansible.netcommon.ipaddr('prefix') }}
+    pcs resource create {{ pcs_resource_vip_name | default(default_pcs_resource_vip_name) }} ocf:heartbeat:IPaddr2 ip={{ mssql_pcs_cluster_vip_cidr | ansible.netcommon.ipaddr('address') }} cidr_netmask={{ mssql_pcs_cluster_vip_cidr | ansible.netcommon.ipaddr('prefix') }}
   register: result
 
 - name: Output
