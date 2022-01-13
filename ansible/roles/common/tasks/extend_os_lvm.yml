@@ -10,16 +10,16 @@
 - name: Extend the LVM partition
   community.general.parted:
     device: /dev/sda
-    number: "{{ sda_info.partitions | length }}"
+    number: "{{ sd_info.partitions | length }}"
     part_end: "100%"
     resize: true
     state: present
 
 # ---
-- name: "Resize the volume group /dev/sda{{ sda_info.partitions | length }} to the maximum possible"
+- name: "Resize the volume group /dev/sda{{ sd_info.partitions | length }} to the maximum possible"
   community.general.lvg:
     vg: "{{ ansible_facts.lvm.lvs.root.vg }}"
-    pvs: "/dev/sda{{ sda_info.partitions | length }}"
+    pvs: "/dev/sda{{ sd_info.partitions | length }}"
     pvresize: yes
 
 #---
