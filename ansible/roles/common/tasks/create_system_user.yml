@@ -27,32 +27,37 @@
   set_fact:
     hash_salt: "{{ lookup('community.general.random_string', length=16, min_lower=1, min_upper=1, special=false, min_numeric=1) }}"
 
+- name: Set account variables
+  set_fact:
+    account_username: "{{ system_create_account_username | default(default_system_create_account_username) }}"
+    account_password: "{{ system_create_account_password | default(default_system_create_account_password) }}"
+
 - name: Validate username and password are defined
   ansible.builtin.assert:
-    that: system_user_username is defined and user_password is defined
-    fail_msg: "Both 'user_username' and 'user_password' must be defined"
+    that: account_username is defined and account_password is defined
+    fail_msg: "Both 'system_create_account_username' and 'system_create_account_password' must be defined"
 
 - name: Validate username is not empty
   ansible.builtin.assert:
-    that: (system_user_username | default(default_system_user_username)) | length >= 3
+    that: account_username | length >= 3
     fail_msg: "'system_user_username' must not be empty and at least 3 characters"
 
 - name: Validate password is not empty
   ansible.builtin.assert:
-    that:  (system_user_password | default(default_system_user_password)) | length >= 6
+    that: account_password | length >= 6
     fail_msg: "'system_user_password' must not be empty and at least 6 characters"
 
-- name: "Create user {{ system_user_username | default(default_system_user_username) }}"
+- name: "Create user {{ account_username }}"
   ansible.builtin.user:
-    name: "{{ system_user_username | default(default_system_user_username) }}"
-    password: "{{ vars.user_password | password_hash('sha512', hash_salt) }}"
+    name: "{{ account_username }}"
+    password: "{{ account_password | password_hash('sha512', hash_salt) }}"
     shell: "{{ shell_path }}"
     groups: "{{ sudo_group }}"
     append: yes
 
 - name: Set authorized key
   ansible.posix.authorized_key:
-    user: "{{ system_user_username | default(default_system_user_username) }}"
-    state: present
+    user: "{{ account_username }}"
     key: "{{ lookup('file', system_user_ssh_key_file) }}"
+    state: present
   when: system_user_ssh_key_file is defined

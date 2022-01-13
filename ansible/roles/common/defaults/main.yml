@@ -25,6 +25,6 @@ default_system_mount_options: noatime
 default_system_mount_paths: ['/mnt/data']
 
 # User parameters
-default_system_create_user: false
-default_system_user_username: vmware
-default_system_user_password: vmware
+default_system_create_account: false
+default_system_create_account_username: vmware
+default_system_create_account_password: vmware
