@@ -1,4 +1,11 @@
 ---
+- name: Gather hardware facts
+  setup:
+    gather_subset:
+      - !all
+      - !min
+      - hardware
+
 - name: Read device information (always use unit when probing)
   community.general.parted: device=/dev/sda unit=MiB
   register: sd_info
@@ -16,7 +23,6 @@
     resize: true
     state: present
 
-# ---
 - name: "Resize the volume group /dev/sda{{ sd_info.partitions | length }} to the maximum possible"
   community.general.lvg:
     vg: "{{ ansible_facts.lvm.lvs.root.vg }}"
