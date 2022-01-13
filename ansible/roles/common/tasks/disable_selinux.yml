@@ -10,9 +10,9 @@
 - name: Disable SELinux
   ansible.posix.selinux:
     state: disabled
-  register: selinux_state
+  notify:
+    - Reboot machine
 
-- name: Perform reboot if required
-  ansible.builtin.reboot:
-    reboot_timeout: 300
-  when: selinux_state.changed
+- name: Flush handlers
+  meta: flush_handlers
+
