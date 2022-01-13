@@ -1,9 +1,9 @@
 ---
 - name: Gather hardware facts
-  setup:
+  ansible.builtin.setup:
     gather_subset:
-      - !all
-      - !min
+      - '!all'
+      - '!min'
       - hardware
 
 - name: Read device information (always use unit when probing)
