@@ -12,7 +12,7 @@
       Disable SELinux: {{ system_selinux_disable }}
       Extend OS LVM: {{ system_extend_os_lvm }}
       Mount data disks: {{ system_mount_data_disks }}
-      Create user account: {{ system_user_create }}
+      Create user account: {{ system_create_account }}
 
 - name: Upgrade all system packages
   import_tasks: upgrade_system_packages.yml
