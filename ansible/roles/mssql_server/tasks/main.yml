@@ -49,7 +49,7 @@
   include_tasks: configure_pacemaker_all.yml
 
 - name: Configure Pacemaker on the primary node
-  imporinclude_taskst_tasks: configure_pacemaker_primary.yml
+  include_tasks: configure_pacemaker_primary.yml
   when: inventory_hostname == play_hosts[0]
 
 - name: Configure MSSQL Availability Group
