@@ -33,7 +33,7 @@ all:
     system_data_disk_mount_paths: ['/sqlnux']
 
     # User
-    system_create_account: false
+    system_create_account: true
     system_create_account_username: vmware
     system_create_account_password: vmware
     #system_create_account_key_file: ~/.ssh/id_rsa.pub
