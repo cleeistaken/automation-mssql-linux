@@ -32,9 +32,9 @@
   roles:
     - role: common
 
-#- name: Install MSSQL
-#  hosts: all
-#  any_errors_fatal: true
-#  roles:
-#    - role: mssql_server
+- name: Install MSSQL
+  hosts: all
+  any_errors_fatal: true
+  roles:
+    - role: mssql_server
 
