@@ -108,10 +108,6 @@
   register: result
   when: inventory_hostname == play_hosts[0]
 
-- debug:
-    var: result.stdout
-  when: inventory_hostname == play_hosts[0]
-
 #
 # Create database backup
 #
@@ -131,10 +127,6 @@
   register: result
   when: inventory_hostname == play_hosts[0]
 
-- debug:
-    var: result.stdout
-  when: inventory_hostname == play_hosts[0]
-
 #
 # Add Database to Availability Group
 #
@@ -146,8 +138,4 @@
     -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
     -Q "IF NOT EXISTS (SELECT AGDatabases.database_name AS name FROM sys.dm_hadr_availability_group_states States INNER JOIN master.sys.availability_groups Groups ON States.group_id = Groups.group_id INNER JOIN sys.availability_databases_cluster AGDatabases ON Groups.group_id = AGDatabases.group_id WHERE primary_replica = @@Servername AND AGDatabases.database_name = '{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}') BEGIN ALTER AVAILABILITY GROUP [{{ mssql_ag_name | default(default_mssql_ag_name) }}] ADD DATABASE [{{ MSSQL_AG_DB_NAME }}] END;"
   register: result
-  when: inventory_hostname == play_hosts[0]
-
-- debug:
-    var: result.stdout
   when: inventory_hostname == play_hosts[0]
