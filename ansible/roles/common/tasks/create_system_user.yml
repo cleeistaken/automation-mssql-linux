@@ -36,16 +36,19 @@
   ansible.builtin.assert:
     that: account_username is defined and account_password is defined
     fail_msg: "Both 'system_create_account_username' and 'system_create_account_password' must be defined"
+    success_msg: "Both username and password are defined"
 
 - name: Validate username is not empty
   ansible.builtin.assert:
     that: account_username | length >= 3
     fail_msg: "'system_user_username' must not be empty and at least 3 characters"
+    success_msg: "The username appears valid"
 
 - name: Validate password is not empty
   ansible.builtin.assert:
     that: account_password | length >= 6
     fail_msg: "'system_user_password' must not be empty and at least 6 characters"
+    success_msg: "The password appears valid"
 
 - name: "Create user {{ account_username }}"
   ansible.builtin.user:

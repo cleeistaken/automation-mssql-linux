@@ -2,7 +2,7 @@
 - name: Gather hardware facts
   setup:
     gather_subset:
-      - hardware
+      - 'hardware'
 
 - name: Print parameters
   ansible.builtin.debug:
@@ -32,7 +32,7 @@
 
 - name: List mounted devices
   debug:
-    msg: "Currently mounted disks: {{ mounted_devices | join('\n') }}"
+    msg: "Currently mounted disks:\n{{ mounted_devices | join('\n') }}"
 
 - name: Partition disks
   parted:
