@@ -3,7 +3,7 @@ all:
   vars:
 
     #
-    #
+    # Role: Common
     #
 
     # Host packages
@@ -13,7 +13,8 @@ all:
     # Hosts file
     # Edit the hosts file and add entries for each system.
     system_hosts_file_create: true
-    system_hosts_file: /etc/hosts
+    #system_hosts_file: /etc/hosts
+    #system_hosts_file_disable_entries: ['127.0.1.1']
 
     # Firewall
     # Entirely disable the firewall.
@@ -27,17 +28,20 @@ all:
     # If the OS disks has been increased should the LVM be extended and use all the available space.
     system_extend_os_lvm: true
 
-
+    # Data Disk(s)
     system_mount_data_disks: true
-    data_disk_mount_paths: [ '/sqlnux' ]
+    #system_data_disks_filesystem: xfs
+    system_data_disk_mount_paths: ['/sqlnux']
 
     # User
-    user_create: true
-    user_username: 'vmware'
-    user_password: 'VMware1!'
+    system_user_create: true
+    system_user_username: 'vmware'
+    system_user_password: 'VMware1!'
+    #system_user_ssh_key_file: ~/.ssh/id_rsa.pub
 
     #
-    # MSSQL Server
+    # Role: MSSQL Server
+    #
     # https://dba.stackexchange.com/questions/216955/listing-the-microsoft-sql-server-configuration-with-the-values-set-by-mssql-conf
 
     MSSQL_PORT: 1433
