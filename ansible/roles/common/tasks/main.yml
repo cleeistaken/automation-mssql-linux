@@ -3,7 +3,7 @@
   ansible.builtin.debug:
     msg: "The system distribution is: {{ ansible_distribution }}"
 
-- name: Print distribution
+- name: Print parameters
   ansible.builtin.debug:
     msg: |
       Upgrade packages: {{ system_upgrade_all_packages }}
@@ -16,15 +16,15 @@
 
 - name: Upgrade all system packages
   import_tasks: upgrade_system_packages.yml
-  when: (system_upgrade_all_packages | default(DEFAULT_SYSTEM_UPGRADE_ALL_PACKAGES))
+  when: system_upgrade_all_packages | default(DEFAULT_SYSTEM_UPGRADE_ALL_PACKAGES)
 
 - name: Update hosts file
   import_tasks: update_hosts_file.yml
-  when: (system_hosts_file_create | default(DEFAULT_SYSTEM_HOSTS_FILE_CREATE))
+  when: system_hosts_file_create | default(DEFAULT_SYSTEM_HOSTS_FILE_CREATE)
 
 - name: Disable firewall
   import_tasks: disable_firewall.yml
-  when: (system_firewall_disable | default(DEFAULT_SYSTEM_FIREWALL_DISABLE))
+  when: system_firewall_disable | default(DEFAULT_SYSTEM_FIREWALL_DISABLE)
 
 - name: Disable SELinux
   import_tasks: disable_selinux.yml
