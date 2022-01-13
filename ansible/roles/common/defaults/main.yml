@@ -28,3 +28,4 @@ default_system_mount_paths: ['/mnt/data']
 default_system_create_account: false
 default_system_create_account_username: vmware
 default_system_create_account_password: vmware
+#default_system_create_account_key_file: ~/.ssh/id_rsa.pub
