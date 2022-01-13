@@ -242,7 +242,7 @@
 #
 - name: Set the MSSQL telemetry user requested local audit directory
   set_fact:
-    audit_directory: "{{ mssql_telemetry_user_requested_local_audit_directory | default(default_mssql_telemetry_user_requested_local_audit_directory)}}"
+    audit_directory: "{{ mssql_telemetry_user_requested_local_audit_directory | default(default_mssql_telemetry_user_requested_local_audit_directory) }}"
 
 - name: Check if the path exists
   ansible.builtin.stat:
