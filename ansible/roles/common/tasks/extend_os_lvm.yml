@@ -6,16 +6,9 @@
       - '!min'
       - 'hardware'
 
-- debug:
-    var: ansible_facts.lvm
-
 - name: Read device information (always use unit when probing)
   community.general.parted: device=/dev/sda unit=MiB
   register: sd_info
-
-- name: Print /dev/sda information
-  ansible.builtin.debug:
-    var: sd_info
 
 - name: Extend the LVM partition
   community.general.parted:
@@ -28,45 +21,15 @@
 
 - name: "Resize the volume group /dev/sda{{ sd_info.partitions | length }} to the maximum possible"
   community.general.lvg:
-    vg: >
-      ansible_facts.lvm.pvs['/dev/sda'{{ sd_info.partitions | length }}].vg
+    vg: "{{ ansible_facts.lvm.pvs['/dev/sda' + (sd_info.partitions | length | string)].vg }}"
     pvs: "/dev/sda{{ sd_info.partitions | length }}"
     pvresize: yes
 
-#---
+- name: Expand the filesystem to all available space
+  community.general.lvol:
+    vg: "{{ ansible_facts.lvm.pvs['/dev/sda' + (sd_info.partitions | length | string)].vg }}"
+    lv: "{{ ansible_facts.lvm.lvs.keys() | list | first }}"
+    size: +100%FREE
+    resizefs: true
 
 
-#- name: resize physical volume
-#  command: "pvresize /dev/sda3"
-#  register: lvm_pvresize_output
-#  tags:
-#    - lvm
-#    - resizefs
-
-#- name: get free space in vg
-#  shell: "vgdisplay | grep Free | cut -d '/' -f 3 | cut -d ' ' -f 2 | tr -d '[:space:]'"
-#  register: vgdisplay_output
-
-#- name: Set volume group free space
-#  set_fact:
-#    vg_free: "{{ vgdisplay_output.stdout_lines[0] }}"
-
-#-  name: get volume group name
-#   shell: "vgdisplay | grep 'VG Name' | cut -c 10- | tr -d '[:space:]'"
-#   register: vgdisplay_output
-
-#- name: Set volume group name
-#  set_fact:
-#    vg_name: "{{ vgdisplay_output.stdout_lines[0] }}"
-
-#- name: Print free space
-#  ansible.builtin.debug:
-#    msg: "{{ vg_name }}: {{ vg_free }}"
-
-#- name: Extend the logical volume to take all remaining space of the PVs and resize the underlying filesystem
-#  lvol:
-#   vg: "{{ vg_name }}"
-#    lv: root
-#    size: +100%FREE
-#    resizefs: true
-#  when: vg_free|int > 0
