@@ -14,7 +14,7 @@ all:
     # Edit the hosts file and add entries for each system.
     system_hosts_file_create: true
     #system_hosts_file: /etc/hosts
-    #system_hosts_file_disable_entries: ['127.0.1.1']
+    system_hosts_file_disable_entries: ['127.0.1.1']
 
     # Firewall
     # Entirely disable the firewall.

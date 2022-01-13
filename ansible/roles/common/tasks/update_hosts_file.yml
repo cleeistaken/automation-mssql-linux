@@ -22,7 +22,7 @@
 
 - name: Comment out entries
   replace:
-    dest: "{{ hosts_file }}"
+    dest: "{{ system_hosts_file | default(DEFAULT_SYSTEM_HOSTS_FILE) }}"
     regexp: '^{{item}}'
     replace: '#{{item}}'
   loop: "{{ system_hosts_file_disable_entries | default(DEFAULT_SYSTEM_HOSTS_FILE_DISABLE_ENTRIES) }}"
