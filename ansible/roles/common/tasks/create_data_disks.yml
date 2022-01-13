@@ -32,7 +32,7 @@
 
 - name: List mounted devices
   debug:
-    msg: "Currently mounted disks: {{ mounted_devices | join(',') }}"
+    msg: "Currently mounted disks: {{ mounted_devices | join('\n') }}"
 
 - name: Partition disks
   parted:
