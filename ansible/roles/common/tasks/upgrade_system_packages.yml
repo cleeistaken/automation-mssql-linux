@@ -2,14 +2,14 @@
 - name: Upgrade all packages CentOS or Redhat
   yum:
     name: '*'
-    state: latest
+    state: latest # noqa package-latest
   when: ansible_distribution == 'CentOS' or
         ansible_distribution == 'RedHat'
 
 - name: Install yum-utils CentOS or RedHat
   yum:
     name: yum-utils
-    state: latest
+    state: present
   when: ansible_distribution == 'CentOS' or
         ansible_distribution == 'RedHat'
 
