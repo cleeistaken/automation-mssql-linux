@@ -10,6 +10,7 @@
 - name: Extend the LVM partition
   community.general.parted:
     device: /dev/sda
+    label: gpt
     number: "{{ sd_info.partitions | length }}"
     part_end: "100%"
     resize: true
