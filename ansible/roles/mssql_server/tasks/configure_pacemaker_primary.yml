@@ -10,7 +10,7 @@
 
 - name: Authenticate pacemaker nodes
   ansible.builtin.command: >
-    pcs host -u hacluster -p {{ (mssql_hacluster_password | default(default_mssql_hacluster_password) }} auth {{ pcs_fqdn | join(' ') }}
+    pcs host -u hacluster -p {{ mssql_hacluster_password | default(default_mssql_hacluster_password) }} auth {{ pcs_fqdn | join(' ') }}
   register: result
 
 - name: Output
