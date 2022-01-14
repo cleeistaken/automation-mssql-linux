@@ -52,7 +52,7 @@
     that:
       - mssql_sa_password | default(default_mssql_sa_password) is defined
       - mssql_sa_password | default(default_mssql_sa_password) | length >= 8
-    fail_msg: "The specified SA password does not meet SQL Server password policy requirements because it is too short. The password must be at least 8 characters"
+    fail_msg: "The specified SA password does not meet SQL Server password policy requirements"
     success_msg: "The SA password is valid"
 
 #
@@ -67,7 +67,7 @@
     that:
       - mssql_pacemaker_password | default(mssql_pacemaker_password) is defined
       - mssql_pacemaker_password | default(mssql_pacemaker_password) | length >= 8
-    fail_msg: "The specified SA password does not meet SQL Server password policy requirements because it is too short. The password must be at least 8 characters"
+    fail_msg: "The specified password does not meet SQL Server password policy requirements"
     success_msg: "The pacemaker user password is valid"
 
 - name: Install MSSQL Server (CentOS/RedHat)
