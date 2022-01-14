@@ -15,7 +15,13 @@
   ansible.builtin.assert:
     that:
       - mssql_pid is defined
-      - mssql_pid | lower in ['evaluation', 'developer', 'express', 'web', 'standard', 'enterprise'] or mssql_pid | length > 12)
+      - mssql_pid | lower == 'evaluation' or
+        mssql_pid | lower == 'developer' or
+        mssql_pid | lower == 'express' or
+        mssql_pid | lower == 'web' or
+        mssql_pid | lower == 'standard' or
+        mssql_pid | lower == 'enterprise' or
+        mssql_pid | length > 12 # probably a decent test for a serial?
     fail_msg: "Cannot install if the MSSQL Product ID is not accepted: 'mssql_pid'"
     success_msg: "Using MSSQL product id: {{ mssql_pid }}"
 
