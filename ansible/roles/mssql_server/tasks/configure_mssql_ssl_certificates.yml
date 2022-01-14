@@ -71,7 +71,7 @@
     -s localhost 
     -U SA 
     -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
-    -Q "IF NOT EXISTS (SELECT name FROM sys.endpoints WHERE name LIKE '{{ mssql_ag_endpoint | default(default_mssql_ag_endpoint) }}') BEGIN CREATE ENDPOINT {{ mssql_endpoint | default(default_mssql_endpoint) }} STATE = STARTED AS TCP (LISTENER_PORT = {{ mssql_endpoint_listener_port | default(default_mssql_endpoint_listener_port) }}, LISTENER_IP = ALL) FOR DATABASE_MIRRORING (AUTHENTICATION = CERTIFICATE {{ ansible_hostname_sanitized }}_cert, ROLE = ALL) END;"
+    -Q "IF NOT EXISTS (SELECT name FROM sys.endpoints WHERE name LIKE '{{ mssql_ag_endpoint | default(default_mssql_ag_endpoint) }}') BEGIN CREATE ENDPOINT {{ mssql_ag_endpoint | default(default_mssql_ag_endpoint) }} STATE = STARTED AS TCP (LISTENER_PORT = {{ mssql_endpoint_listener_port | default(default_mssql_endpoint_listener_port) }}, LISTENER_IP = ALL) FOR DATABASE_MIRRORING (AUTHENTICATION = CERTIFICATE {{ ansible_hostname_sanitized }}_cert, ROLE = ALL) END;"
   register: result
 
 - name: Validate the endpoint was created successfully
