@@ -83,7 +83,7 @@
 #
 - name: Create fence using fence_vmware_soap
   ansible.builtin.command: >
-    pcs stonith create {{ pcs_fence_name | default(default_pcs_fence_name) }} 
+    pcs stonith create {{ mssql_pcs_fence_name | default(default_mssql_pcs_fence_name) }} 
     fence_vmware_soap pcmk_host_map="{{ pcs_mappings | join(';')   }}" 
     ipaddr={{ vars.vcenter.host }} 
     ssl=1 
