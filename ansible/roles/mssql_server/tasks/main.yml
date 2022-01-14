@@ -40,6 +40,13 @@
     fail_msg: "Cannot install if the PCS Cluster VIP is not configured and valid: 'mssql_pcs_cluster_vip_cidr'"
     success_msg: "PCS Cluster VIP: {{ mssql_pcs_cluster_vip_cidr }}"
 
+#
+# The password must be at least 8 characters long and contain characters
+# from three of the following four sets: Uppercase letters, Lowercase letters,
+# Base 10 digits, and Symbols.
+#
+# The current test is not sufficient.
+#
 - name: Validate SA password
   ansible.builtin.assert:
     that:
@@ -52,6 +59,8 @@
 # The password must be at least 8 characters long and contain characters
 # from three of the following four sets: Uppercase letters, Lowercase letters,
 # Base 10 digits, and Symbols.
+#
+# The current test is not sufficient.
 #
 - name: Validate MSSQL pacemaker user password
   ansible.builtin.assert:
@@ -90,3 +99,4 @@
 - name: Configure Pacemaker AG resource on the primary node
   include_tasks: configure_pacemaker_ag.yml
   when: inventory_hostname == play_hosts[0]
+
