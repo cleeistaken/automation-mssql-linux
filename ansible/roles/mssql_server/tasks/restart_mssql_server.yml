@@ -2,8 +2,11 @@
 - name: Restart MSSQL Server
   ansible.builtin.service:
     name: mssql-server
-    sleep: 5
     state: restarted
+  register: task_action
+  delay: 5
+  retries: 5
+  until: task_action is success
 
 # https://github.com/mikecali/mssql2019-roles-RHEL8/blob/main/site.yaml
 - name: Wait up to 60 seconds for server to become available after creation

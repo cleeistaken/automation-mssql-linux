@@ -39,32 +39,15 @@
     - role: mssql_server
 
 - name: Print Information
-  hosts: all
-    gather
+  hosts: all[0]
+  gather_facts: no
   tasks:
-    - name: Print Information
+    - name: Print Node Information
       ansible.builtin.debug:
         msg: |
-          Cluster Information
-          --------------------------------
-          VIP:         {{ mssql_pcs_cluster_vip_cidr | ansible.netcommon.ipaddr('address') }}
-          AG:          '{{ mssql_ag_name | default(default_mssql_ag_name) }}'
-          DB:          '{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}'
-          ================================
-
           Node Information
           --------------------------------
           Nodes:       {{ groups['mssql_linux_vm'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | join(', ') }}
           Username:    '{{ system_create_account_username | default(default_system_create_account_username) }}'
           Password:    '{{ system_create_account_password | default(default_system_create_account_password) }}'
           ================================
-
-          MSSQL Information
-          --------------------------------
-          PID:         '{{ mssql_pid }}'
-          SA Password: '{{ mssql_sa_password | default(default_mssql_sa_password) }}'
-          User:        '{{ mssql_install_user_username | default(default_mssql_install_user_username) }}'
-          Password:    '{{ mssql_install_user_password | default(default_mssql_install_user_password) }}'
-          ================================
-
-
