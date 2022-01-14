@@ -31,7 +31,7 @@
 
 - name: Add pcs constraint colocation
   ansible.builtin.command:  >
-    pcs constraint colocation add {{ pcs_resource_vip_name | default(default_pcs_resource_vip_name) }} with master {{ ag_cluster }}-clone INFINITY
+    pcs constraint colocation add {{ mssql_pcs_resource_vip_name | default(default_mssql_pcs_resource_vip_name) }} with master {{ ag_cluster }}-clone INFINITY
   register: result
 
 - name: Output
@@ -49,7 +49,7 @@
 
 - name: Add pcs constraint ordering
   ansible.builtin.command: >
-    pcs constraint order promote {{ ag_cluster }}-clone then start {{ pcs_resource_vip_name | default(default_pcs_resource_vip_name) }}
+    pcs constraint order promote {{ ag_cluster }}-clone then start {{ mssql_pcs_resource_vip_name | default(default_mssql_pcs_resource_vip_name ) }}
   register: result
 
 - name: Output
