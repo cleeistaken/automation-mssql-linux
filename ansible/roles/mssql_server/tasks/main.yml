@@ -1,7 +1,7 @@
 ---
 - name: Print distribution
   ansible.builtin.debug:
-    msg: "The system distribution is: {{ ansible_distribution }}"
+    msg: "The system distribution is: {{ ansible_distribution }} {{ ansible_distribution_version }}"
 
 - name: Validate Dsitribution
   ansible.builtin.assert:
