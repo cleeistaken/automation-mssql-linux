@@ -65,8 +65,8 @@
 - name: Validate MSSQL pacemaker user password
   ansible.builtin.assert:
     that:
-      - mssql_pacemaker_password | default(mssql_pacemaker_password) is defined
-      - mssql_pacemaker_password | default(mssql_pacemaker_password) | length >= 8
+      - mssql_pacemaker_password | default(default_mssql_pacemaker_password) is defined
+      - mssql_pacemaker_password | default(default_mssql_pacemaker_password) | length >= 8
     fail_msg: "The specified password does not meet SQL Server password policy requirements"
     success_msg: "The pacemaker user password is valid"
 
