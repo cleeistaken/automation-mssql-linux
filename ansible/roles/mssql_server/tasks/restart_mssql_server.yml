@@ -2,6 +2,7 @@
 - name: Restart MSSQL Server
   ansible.builtin.service:
     name: mssql-server
+    sleep: 5
     state: restarted
 
 # https://github.com/mikecali/mssql2019-roles-RHEL8/blob/main/site.yaml
