@@ -3,6 +3,13 @@
   ansible.builtin.debug:
     msg: "The system distribution is: {{ ansible_distribution }}"
 
+- name: Validate Dsitribution
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution == 'CentOS' and (ansible_distribution_version == '16.04' or ansible_distribution_version == '20.04')
+    fail_msg: "Unsupported distribution version: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+    success_msg: "Supported distribution and version"
+
 - name: Validate MSSQL EULA
   ansible.builtin.assert:
     that:

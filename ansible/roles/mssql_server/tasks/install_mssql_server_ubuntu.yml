@@ -1,4 +1,14 @@
 ---
+#
+# Ref. https://docs.microsoft.com/en-us/sql/linux/quickstart-install-connect-ubuntu?view=sql-server-ver15&viewFallbackFrom=sql-server-2016
+#      https://docs.microsoft.com/en-us/sql/linux/quickstart-install-connect-ubuntu?view=sql-server-linux-2017
+#      https://docs.microsoft.com/en-us/sql/linux/quickstart-install-connect-ubuntu?view=sql-server-ver15&viewFallbackFrom=sql-server-linux-2019
+#
+#      MSSQL 2016: Ubuntu 16.04, 18.04, or 20.04
+#      MSSQL 2017: Ubuntu 16.04 or 18.04
+#      MSSQL 2019: Ubuntu 16.04, 18.04, or 20.04
+#
+
 - name: Add Microsoft keys to apt
   ansible.builtin.apt_key:
     url: https://packages.microsoft.com/keys/microsoft.asc
@@ -92,7 +102,7 @@
 # re: apt upgrade full raises a "Could not get lock /var/lib/dpkg/lock-frontend"
 # https://github.com/ansible/ansible/issues/51663
 #
-# The mssql server agent is now bundled with mssql-server and does not need to be
+# Starting with 2019 the mssql server agent is now bundled with mssql-server and does not need to be
 # installed separately.
 # https://github.com/Microsoft/mssql-docker/issues/270
 - name: Install MSSQL Agent
@@ -104,7 +114,8 @@
   delay: 5
   retries: 60
   until: apt_action is success or ('Failed to lock apt for exclusive operation' not in apt_action.msg and '/var/lib/dpkg/lock' not in apt_action.msg)
-  when: (mssql_install_agent | default(default_mssql_install_agent)) and false # always false for mssql server 2019
+  when: (mssql_install_agent | default(default_mssql_install_agent)) and 
+         ansible_distribution_version == '16.04'
 
 # re: apt upgrade full raises a "Could not get lock /var/lib/dpkg/lock-frontend"
 # https://github.com/ansible/ansible/issues/51663
@@ -143,7 +154,8 @@
   delay: 5
   retries: 60
   until: apt_action is success or ('Failed to lock apt for exclusive operation' not in apt_action.msg and '/var/lib/dpkg/lock' not in apt_action.msg)
-  when: mssql_install_intg_svc | default(default_mssql_install_intg_svc)
+  when: mssql_install_intg_svc | default(default_mssql_install_intg_svc) and 
+        ansible_distribution_version == '16.04'
 
 - name: Restart the MSSQL Server
   import_tasks: restart_mssql_server.yml
