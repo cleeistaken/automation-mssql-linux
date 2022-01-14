@@ -105,7 +105,7 @@
     -s localhost 
     -U SA 
     -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
-    -Q "IF NOT EXISTS (SELECT name from master.sys.databases WHERE name = '{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}') BEGIN CREATE DATABASE [{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}]; ALTER DATABASE [{{ mssql_ag_db_name }}] SET RECOVERY FULL END;"
+    -Q "IF NOT EXISTS (SELECT name from master.sys.databases WHERE name = '{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}') BEGIN CREATE DATABASE [{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}]; ALTER DATABASE [{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}] SET RECOVERY FULL END;"
   register: result
   when: inventory_hostname == play_hosts[0]
 
