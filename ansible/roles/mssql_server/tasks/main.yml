@@ -3,7 +3,7 @@
   ansible.builtin.debug:
     msg: "The system distribution is: {{ ansible_distribution }} {{ ansible_distribution_version }}"
 
-- name: Validate Dsitribution
+- name: Validate distribution
   ansible.builtin.assert:
     that:
       - ansible_distribution == 'Ubuntu' and (ansible_distribution_version == '16.04' or ansible_distribution_version == '20.04')
@@ -40,13 +40,26 @@
     fail_msg: "Cannot install if the PCS Cluster VIP is not configured and valid: 'mssql_pcs_cluster_vip_cidr'"
     success_msg: "PCS Cluster VIP: {{ mssql_pcs_cluster_vip_cidr }}"
 
-- name: Validate SA Password
+- name: Validate SA password
   ansible.builtin.assert:
     that:
       - mssql_sa_password | default(default_mssql_sa_password) is defined
       - mssql_sa_password | default(default_mssql_sa_password) | length >= 8
     fail_msg: "The specified SA password does not meet SQL Server password policy requirements because it is too short. The password must be at least 8 characters"
     success_msg: "The SA password is valid"
+
+#
+# The password must be at least 8 characters long and contain characters
+# from three of the following four sets: Uppercase letters, Lowercase letters,
+# Base 10 digits, and Symbols.
+#
+- name: Validate MSSQL pacemaker user password
+  ansible.builtin.assert:
+    that:
+      - mssql_pacemaker_password | default(mssql_pacemaker_password) is defined
+      - mssql_pacemaker_password | default(mssql_pacemaker_password) | length >= 8
+    fail_msg: "The specified SA password does not meet SQL Server password policy requirements because it is too short. The password must be at least 8 characters"
+    success_msg: "The pacemaker user password is valid"
 
 - name: Install MSSQL Server (CentOS/RedHat)
   include_tasks: install_mssql_server_centos.yml

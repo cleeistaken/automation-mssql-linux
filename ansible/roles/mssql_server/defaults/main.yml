@@ -13,7 +13,7 @@ default_mssql_install_user_username: vmware
 default_mssql_install_user_password: VMware1!
 default_mssql_hacluster_password: VMware1!
 default_mssql_pacemaker_username: paceuser
-default_mssql_pacemaker_password: pacepass
+default_mssql_pacemaker_password: VMware1
 
 # Components
 default_mssql_install_agent: true
@@ -66,5 +66,3 @@ default_mssql_endpoint_listener_port: 5022
 default_mssql_pcs_cluster_name: pcscluster1
 default_mssql_pcs_resource_vip_name: vip1
 default_mssql_pcs_fence_name: vmw_fence1
-
-

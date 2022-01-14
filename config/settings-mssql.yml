@@ -67,13 +67,21 @@ all:
     # '<ip>/<prefix>
     mssql_pcs_cluster_vip_cidr: '172.16.20.221/23'
 
+    # Tunable Parameters
+    # These can be changed to customize the deployment.
+
     # Accounts
+    # Note:
+    # The password must be at least 8 characters long and contain characters
+    # from three of the following four sets: Uppercase letters, Lowercase letters,
+    # Base 10 digits, and Symbols.
+    #
     #mssql_sa_password: VMware1!
     #mssql_install_user_username: vmware
     #mssql_install_user_password: VMware1!
     #mssql_hacluster_password: VMware1!
     #mssql_pacemaker_username: paceuser
-    #mssql_pacemaker_password: pacepass
+    #mssql_pacemaker_password: VMware1!
 
     # Components
     #mssql_install_agent: true

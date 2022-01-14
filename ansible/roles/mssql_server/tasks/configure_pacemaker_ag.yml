@@ -24,6 +24,7 @@
 - name: Create AG cluster resource
   ansible.builtin.command: >
     pcs resource create {{ ag_cluster }} ocf:mssql:ag ag_name={{ mssql_ag_name | default(default_mssql_ag_name) }} meta failure-timeout=30s promotable notify=true
+  register: result
 
 - name: Output
   ansible.builtin.debug:
@@ -76,7 +77,6 @@
 - name: Output
   ansible.builtin.debug:
     var: result
-
 
 #
 # Stonith Configuration
