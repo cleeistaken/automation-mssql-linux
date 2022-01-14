@@ -14,9 +14,8 @@
 - name: Validate MSSQL PID
   ansible.builtin.assert:
     that:
-      - mssql_pid is defined and
-        (mssql_pid in ['Evaluation', 'Developer', 'Express', 'Web', 'Standard', 'Enterprise'] or
-         mssql_pid | length > 12)
+      - mssql_pid is defined
+      - mssql_pid | lower in ['evaluation', 'developer', 'express', 'web', 'standard', 'enterprise'] or mssql_pid | length > 12)
     fail_msg: "Cannot install if the MSSQL Product ID is not accepted: 'mssql_pid'"
     success_msg: "Using MSSQL product id: {{ mssql_pid }}"
 
