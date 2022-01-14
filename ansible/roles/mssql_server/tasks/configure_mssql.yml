@@ -74,13 +74,13 @@
 #
 # Create User
 #
-- name: "Creating user {{ SQL_INSTALL_USER }}"
+- name: "Creating user {{ mssql_install_user_username | default(default_mssql_install_user_username) }}"
   ansible.builtin.command: >
     {{ mssql_tools_bin_path }}/sqlcmd 
     -s localhost 
     -U SA 
     -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
-    -Q "IF NOT EXISTS (SELECT name from sys.database_principals WHERE name = '{{ SQL_INSTALL_USER }}') BEGIN CREATE LOGIN [{{ SQL_INSTALL_USER }}] WITH PASSWORD=N'{{ SQL_INSTALL_USER_PASSWORD }}', DEFAULT_DATABASE=[master], CHECK_EXPIRATION=ON, CHECK_POLICY=ON; ALTER SERVER ROLE [sysadmin] ADD MEMBER [{{ SQL_INSTALL_USER }}] END;"
+    -Q "IF NOT EXISTS (SELECT name from sys.database_principals WHERE name = '{{ mssql_install_user_username | default(default_mssql_install_user_username) }}') BEGIN CREATE LOGIN [{{ mssql_install_user_username | default(default_mssql_install_user_username) }}] WITH PASSWORD=N'{{ mssql_install_user_password | default(default_mssql_install_user_password) }}', DEFAULT_DATABASE=[master], CHECK_EXPIRATION=ON, CHECK_POLICY=ON; ALTER SERVER ROLE [sysadmin] ADD MEMBER [{{ mssql_install_user_username | default(default_mssql_install_user_username) }}] END;"
   register: result
   when: inventory_hostname == play_hosts[0]
 
