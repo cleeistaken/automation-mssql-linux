@@ -18,15 +18,16 @@
     port: "{{ item.port }}"
     proto: "{{ item.proto }}"
   loop: "{{ firewall_ports }}"
-  when: is_ubuntu
+  when: ansible_distribution == 'Ubuntu'
 
-- name: Configure firewall CentOS
+- name: Configure firewall CentOS/RedHat
   ansible.posix.firewalld:
     port: "{{ item.port }}/{{ item.proto }}"
     permanent: yes
     state: enabled
   loop: "{{ firewall_ports }}"
-  when: is_centos
+  when: ansible_distribution == 'CentOS' or
+        ansible_distribution == 'RedHat'
 
 #
 # Enable HA Health Monitoring TransactSQL
