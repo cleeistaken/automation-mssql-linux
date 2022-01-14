@@ -31,8 +31,15 @@
       - mssql_pcs_cluster_vip_cidr is defined and 
         mssql_pcs_cluster_vip_cidr | ipaddr('host/prefix') | length > 0
     fail_msg: "Cannot install if the PCS Cluster VIP is not configured and valid: 'mssql_pcs_cluster_vip_cidr'"
-    success_msg: "Using MSSQL product id: {{ mssql_pid }}"
+    success_msg: "PCS Cluster VIP: {{ mssql_pcs_cluster_vip_cidr }}"
 
+- name: Validate SA Password
+  ansible.builtin.assert:
+    that:
+      - mssql_sa_password | default(default_mssql_sa_password) is defined
+      - mssql_sa_password | default(default_mssql_sa_password) | length >= 8
+    fail_msg: "The specified SA password does not meet SQL Server password policy requirements because it is too short. The password must be at least 8 characters"
+    success_msg: "The SA password is valid"
 
 - name: Install MSSQL Server (CentOS/RedHat)
   include_tasks: install_mssql_server_centos.yml

@@ -68,7 +68,7 @@ all:
     mssql_pcs_cluster_vip_cidr: '172.16.20.221/23'
 
     # Accounts
-    #mssql_sa_password: vmware
+    #mssql_sa_password: VMware1!
     #mssql_install_user_username: vmware
     #mssql_install_user_password: VMware1!
     #mssql_hacluster_password: VMware1!
