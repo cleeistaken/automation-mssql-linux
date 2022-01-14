@@ -91,6 +91,10 @@
 
 # re: apt upgrade full raises a "Could not get lock /var/lib/dpkg/lock-frontend"
 # https://github.com/ansible/ansible/issues/51663
+#
+# The mssql server agent is now bundled with mssql-server and does not need to be
+# installed separately.
+# https://github.com/Microsoft/mssql-docker/issues/270
 - name: Install MSSQL Agent
   ansible.builtin.apt:
     name:
@@ -100,7 +104,7 @@
   delay: 5
   retries: 60
   until: apt_action is success or ('Failed to lock apt for exclusive operation' not in apt_action.msg and '/var/lib/dpkg/lock' not in apt_action.msg)
-  when: mssql_install_agent | default(default_mssql_install_agent)
+  when: (mssql_install_agent | default(default_mssql_install_agent)) and false # always false for mssql server 2019
 
 # re: apt upgrade full raises a "Could not get lock /var/lib/dpkg/lock-frontend"
 # https://github.com/ansible/ansible/issues/51663
