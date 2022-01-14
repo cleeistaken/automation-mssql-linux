@@ -114,7 +114,7 @@
 #
 - name: Delete previous database backup
   ansible.builtin.file:
-    path: "{{ MSSQL_DIRECTORY_BACKUP }}/{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}.bak"
+    path: "{{ mssql_directory_backup | default(default_mssql_directory_backup) }}/{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}.bak"
     state: absent
   when: inventory_hostname == play_hosts[0]
 
