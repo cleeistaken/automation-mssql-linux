@@ -286,7 +286,7 @@
 #
 - name: Set the MSSQL coredump type variable
   set_fact:
-    coredump_type: "{{ sql_coredump_type | default(default_sql_coredump_type) }}"
+    coredump_type: "{{ mssql_coredump_type | default(default_mssql_coredump_type) }}"
 
 - name: Ensure coredump type is valid
   ansible.builtin.assert:

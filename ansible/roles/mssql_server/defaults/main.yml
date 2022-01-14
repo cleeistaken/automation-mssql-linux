@@ -37,7 +37,6 @@ default_mssql_directory_cert: /var/opt/mssql/data
 default_mssql_error_log_filename: 'errorlog'
 default_mssql_telemetry_user_requested_local_audit_directory: /sqlnux/audit
 
-
 # Directory owner, group, and permissions
 default_mssql_directory_user: mssql
 default_mssql_directory_group: mssql
