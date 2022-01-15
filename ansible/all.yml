@@ -17,6 +17,19 @@
       set_fact:
         repo_ip: "{{ ansible_default_ipv4.address }}"
 
+    - name: authenticate to vc
+      ansible.builtin.uri:
+        url: "https://{{ vcenter.host }}/rest/com/vmware/cis/session"
+        url_username: vcenter.username
+        url_password: vcenter.password
+        method: POST
+      register: curl_output
+
+    - name: print output
+      ansible.builtin.debug:
+        var: curl_output
+
+
 #- name: Repo Configuration
 #  hosts: all
 #  any_errors_fatal: true
@@ -26,28 +39,28 @@
 #    - role: repo
 #      when: vars.local_repo|bool == true#
 
-- name: Common Configuration
-  hosts: all
-  any_errors_fatal: true
-  roles:
-    - role: common
+#- name: Common Configuration
+#  hosts: all
+#  any_errors_fatal: true
+#  roles:
+#    - role: common
 
-- name: Install MSSQL
-  hosts: all
-  any_errors_fatal: true
-  roles:
-    - role: mssql_server
+#- name: Install MSSQL
+#  hosts: all
+#  any_errors_fatal: true
+#  roles:
+#    - role: mssql_server
 
-- name: Print Information
-  hosts: all[0]
-  gather_facts: no
-  tasks:
-    - name: Print Node Information
-      ansible.builtin.debug:
-        msg: |
-          Node Information
-          --------------------------------
-          Nodes:       {{ groups['mssql_linux_vm'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | join(', ') }}
-          Username:    '{{ system_create_account_username | default(default_system_create_account_username) }}'
-          Password:    '{{ system_create_account_password | default(default_system_create_account_password) }}'
-          ================================
+#- name: Print Information
+#  hosts: all[0]
+#  gather_facts: no
+#  tasks:
+#    - name: Print Node Information
+#      ansible.builtin.debug:
+#        msg: |
+#          Node Information
+#          --------------------------------
+#          Nodes:       {{ groups['mssql_linux_vm'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | join(', ') }}
+#          Username:    '{{ system_create_account_username | default(default_system_create_account_username) }}'
+#          Password:    '{{ system_create_account_password | default(default_system_create_account_password) }}'
+#          ================================
