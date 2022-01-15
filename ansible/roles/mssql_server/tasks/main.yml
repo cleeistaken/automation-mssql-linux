@@ -103,11 +103,16 @@
 - name: Print MSSQL Information
   ansible.builtin.debug:
     msg: |
-      Cluster Information
+      PCS Cluster Information
       --------------------------------
-      VIP:         {{ mssql_pcs_cluster_vip_cidr | ansible.netcommon.ipaddr('address') }}
-      AG:          '{{ mssql_ag_name | default(default_mssql_ag_name) }}'
-      DB:          '{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}'
+      VIP:          {{ mssql_pcs_cluster_vip_cidr | ansible.netcommon.ipaddr('address') }}
+      ================================
+      
+      HA Management
+      --------------------------------
+      https://{{ mssql_pcs_cluster_vip_cidr | ansible.netcommon.ipaddr('address') }}:2224
+      User:        'hacluster'
+      Password:    '{{ mssql_hacluster_password | default(default_mssql_hacluster_password) }}'
       ================================
 
       MSSQL Information
@@ -116,5 +121,7 @@
       SA Password: '{{ mssql_sa_password | default(default_mssql_sa_password) }}'
       User:        '{{ mssql_install_user_username | default(default_mssql_install_user_username) }}'
       Password:    '{{ mssql_install_user_password | default(default_mssql_install_user_password) }}'
+      AG:          '{{ mssql_ag_name | default(default_mssql_ag_name) }}'
+      DB:          '{{ mssql_ag_db_name | default(default_mssql_ag_db_name) }}'
       ================================
   when: inventory_hostname == play_hosts[0]
