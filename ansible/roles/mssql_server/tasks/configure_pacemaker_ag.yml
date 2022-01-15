@@ -71,7 +71,7 @@
 #
 - name: "Run pcs resource cleanup on {{ mssql_ag_name | default(default_mssql_ag_name) }}"
   ansible.builtin.command: >
-    pcs resource cleanup {{ mssql_ag_name | default(default_mssql_ag_name) }}
+    pcs resource cleanup {{ ag_cluster }}
   register: result
 
 - name: Output
