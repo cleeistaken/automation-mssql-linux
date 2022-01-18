@@ -6,6 +6,7 @@ TERRAFORM_DIR="terraform"
 echo "Destroying Virtual Machines"
 pushd "$TERRAFORM_DIR" > /dev/null
   ./destroy.sh
+  ./cleanup.sh
 popd > /dev/null
 
 echo "Cleanup old certificates"

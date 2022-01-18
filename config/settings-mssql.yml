@@ -55,17 +55,18 @@ all:
     #  - Enterprise
     #  - A product key
     # Ref. https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-configure-environment-variables?view=sql-server-ver15
-    mssql_pid: enterprise
+    mssql_pid: enterprise 
 
     # Accept the EULA confirm your acceptance of the End-User Licensing Agreement.
     # Required setting for the SQL Server image.
     # Ref. https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-configure-environment-variables?view=sql-server-ver15
+    # value: true/false
     mssql_accept_eula: true
 
     # The Virtual IP for the MSSQL AG
     # This should an address in CIDR format on the same subnet at the MSSQL servers
-    # '<ip>/<prefix>
-    mssql_pcs_cluster_vip_cidr: '172.16.20.221/23'
+    # '<ip>/<prefix>'
+    mssql_pcs_cluster_vip_cidr: ''
 
     # Tunable Parameters
     # These can be changed to customize the deployment.
