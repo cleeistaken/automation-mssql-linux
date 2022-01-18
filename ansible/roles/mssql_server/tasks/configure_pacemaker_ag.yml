@@ -7,7 +7,7 @@
 - name: Create host parameters
   set_fact:
     pcs_fqdn: "{{ pcs_fqdn | default([]) + [ item.0 ] }}"
-    pcs_mappings: "{{ pcs_mappings | default([]) + [ item.0 + ':' + item.1 ] }}"
+    pcs_mappings: "{{ pcs_mappings | default([]) + [ item.0 + ',' + item.1 ] }}"
     pcs_host_addrs: "{{ pcs_host_addrs | default([]) + [ item.0 + ' addr=' + item.2 ] }}"
   with_together:
     - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'ansible_hostname') }}"
