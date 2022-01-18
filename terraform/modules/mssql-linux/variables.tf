@@ -38,7 +38,7 @@ variable "vsphere_network_1_ipv4_ips" {
 
 # Network 1 IPv4 IP List
 variable "vsphere_network_1_ipv4_gateway" {
-  type = list(string)
+  type = string
 }
 
 # Datastore
@@ -62,7 +62,7 @@ variable "network_domain_name" {
 # Domain Name
 variable "network_ipv4_dns_servers" {
   type    = list(string)
-  default = ['8.8.8.8', '8.8.4.4']
+  default = ["8.8.8.8", "8.8.4.4"]
 }
 
 # Domain Name
@@ -87,7 +87,7 @@ variable template_boot {
 # -----------------------------------------------------------------------------
 variable "vm_mssql_prefix" {
   type = string
-  default = 'mssql'
+  default = "mssql-linux"
 }
 
 variable "vm_mssql_count" {

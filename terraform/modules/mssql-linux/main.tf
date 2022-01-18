@@ -6,7 +6,7 @@ data "vsphere_datacenter" "vsphere_datacenter_1" {
 }
 
 data "vsphere_compute_cluster" "vsphere_compute_cluster_1" {
-  name          = var.vsphere_datacenter.vs_cls
+  name          = var.vsphere_compute_cluster
   datacenter_id = data.vsphere_datacenter.vsphere_datacenter_1.id
 }
 

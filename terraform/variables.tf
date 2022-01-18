@@ -100,7 +100,7 @@ variable "vsphere_network_1_ipv4_ips" {
 # Network 1 IPv4 IP Gateway
 variable "vsphere_network_1_ipv4_gateway" {
   description = "vSphere Distributed Switch Portgroup 1 IPv4 Gateway"
-  type        = list(string)
+  type        = string
 }
 
 # Datastore

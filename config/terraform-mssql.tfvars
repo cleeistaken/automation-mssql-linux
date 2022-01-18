@@ -30,9 +30,9 @@ network_dns_suffix = []
 #
 # VM MSSQL
 #
-mssql_linux_vm_prefix = "mssql-linux"
-mssql_linux_vm_count = 3
-mssql_linux_vm = {
+vm_mssql_prefix = "mssql-linux"
+vm_mssql_count = 3
+vm_mssql = {
     cpu = 8
     memory_gb = 32
     os_disk_gb = 60
