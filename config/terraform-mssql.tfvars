@@ -17,7 +17,7 @@ vsphere_network_1_portgroup = "DPortGroup"
 vsphere_network_1_ipv4_subnet_cidr = "10.0.0.0/8"
 vsphere_network_1_ipv4_ips = ["10.0.1.1", "10.0.1.2", "10.0.1.3", "10.0.1.4", "10.0.1.5"]
 vsphere_network_1_ipv4_gateway = "10.0.0.1"
-vsphere_datastore = "vsanDatatstore"
+vsphere_datastore = "vsanDatastore"
 vsphere_storage_policy = "vSAN Default Storage Policy"
 
 #

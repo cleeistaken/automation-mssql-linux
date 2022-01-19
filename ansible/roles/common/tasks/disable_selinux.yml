@@ -1,10 +1,14 @@
 ---
 - name: Install required libraries for Ubuntu
-  apt:
+  ansible.builtin.apt:
     name:
       - python3-selinux
       - selinux-policy-default
     state: present
+  register: apt_action
+  delay: 5
+  retries: 60
+  until: apt_action is success or ('Failed to lock apt for exclusive operation' not in apt_action.msg and '/var/lib/dpkg/lock' not in apt_action.msg)
   when: ansible_distribution == 'Ubuntu'
 
 - name: Disable SELinux
