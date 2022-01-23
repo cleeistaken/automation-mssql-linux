@@ -2,7 +2,6 @@
 
 TERRAFORM_MSSQL="../config/terraform.tfvars"
 TERRAFORM_TEMPLATE="../config/terraform-template.tfvars"
-TERRAFORM_TFPLAN="tfplan"
 
 if [ ! -f "${TERRAFORM_MSSQL}" ]; then
     echo "ERROR: The file ${TERRAFORM_MSSQL} is missing."
@@ -18,15 +17,9 @@ fi
 echo "Initializing Terraform..."
 terraform init
 
-if [ -f "${TERRAFORM_TFPLAN}" ]; then
-    # Invoke terraform to build the environment
-    echo "Applying Terraform using tfplan"
-    terraform apply "${TERRAFORM_TFPLAN}" 
-else
-    # Invoke terraform to build the environment
-    echo "Applying Terraform"
-    terraform apply \
-    -auto-approve \
-    --var-file="${TERRAFORM_MSSQL}" \
-    --var-file="${TERRAFORM_TEMPLATE}"
-fi
+# Invoke terraform to build the environment
+echo "Applying Terraform"
+terraform plan \
+--out=tfplan \
+--var-file="${TERRAFORM_MSSQL}" \
+--var-file="${TERRAFORM_TEMPLATE}"
