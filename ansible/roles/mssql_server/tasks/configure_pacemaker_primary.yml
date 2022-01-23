@@ -15,7 +15,7 @@
 
 - name: Output
   ansible.builtin.debug:
-    var: result
+    var: result.stdout
 
 - name: Get PCS cluster status
   ansible.builtin.command: >
@@ -28,7 +28,7 @@
     cluster_running: "{{ not ('Error: cluster is not currently running on this node' in [result.stdout, result.stderr]) }}"
 
 - name: Output
-  debug:
+  ansible.builtin.debug:
     var: cluster_running
 
 - name: Create and start cluster
@@ -38,8 +38,8 @@
   when: not cluster_running
 
 - name: Output
-  debug:
-    var: result
+  ansible.builtin.debug:
+    var: result.stdout
 
 - name: Set pcs property stonith-enabled to false
   ansible.builtin.command: >
@@ -47,7 +47,7 @@
   register: result
 
 - name: Output
-  debug:
+  ansible.builtin.debug:
     var: result.stdout
 
 - name: Set pcs property no-quorum-polic to ignore
@@ -56,7 +56,7 @@
   register: result
 
 - name: Output
-  debug:
+  ansible.builtin.debug:
     var: result.stdout
 
 - name: Get cluster status
@@ -68,7 +68,7 @@
     var: result.stdout
 
 - name: Wait for PCS cluster to start
-  pause:
+  ansible.builtin.pause:
     seconds: 15
 
 - name: Get cluster status
@@ -86,4 +86,4 @@
 
 - name: Output
   ansible.builtin.debug:
-    var: result
+    var: result.stdout

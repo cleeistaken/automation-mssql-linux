@@ -28,7 +28,7 @@
 
 - name: Output
   ansible.builtin.debug:
-    var: result
+    var: result.stdout
 
 - name: Add pcs constraint colocation
   ansible.builtin.command:  >
@@ -37,7 +37,7 @@
 
 - name: Output
   ansible.builtin.debug:
-    var: result
+    var: result.stdout
 
 - name: Add pcs constraint synchronized secondaries to commit
   ansible.builtin.command:  >
@@ -46,7 +46,7 @@
 
 - name: Output
   ansible.builtin.debug:
-    var: result
+    var: result.stdout
 
 - name: Add pcs constraint ordering
   ansible.builtin.command: >
@@ -55,7 +55,7 @@
 
 - name: Output
   ansible.builtin.debug:
-    var: result
+    var: result.stdout
 
 #- name: Add pcs constraint location preference
 #  ansible.builtin.command: >
@@ -76,7 +76,7 @@
 
 - name: Output
   ansible.builtin.debug:
-    var: result
+    var: result.stdout
 
 #
 # Stonith Configuration
@@ -96,7 +96,7 @@
 
 - name: Output
   ansible.builtin.debug:
-    var: result
+    var: result.stdout
 
 - name: stonith command verbatim
   ansible.builtin.debug:
