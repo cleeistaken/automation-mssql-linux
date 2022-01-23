@@ -1,10 +1,42 @@
 ---
 all:
   vars:
+    # -------------------------------------------------------------------------
+    # Mandatory Parameters
+    # Te variables in this section must be configured
+    # -------------------------------------------------------------------------
+
+    # Set the SQL Server edition or product key. Possible values include:
+    #  - Evaluation
+    #  - Developer
+    #  - Express
+    #  - Web
+    #  - Standard
+    #  - Enterprise
+    #  - A product key
+    # Ref. https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-configure-environment-variables?view=sql-server-ver15
+    mssql_pid: enterprise
+
+    # Accept the EULA confirm your acceptance of the End-User Licensing Agreement.
+    # Required setting for the SQL Server image.
+    # Ref. https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-configure-environment-variables?view=sql-server-ver15
+    # value: true/false
+    mssql_accept_eula: true
+
+    # The Virtual IP for the MSSQL AG
+    # This should an address in CIDR format on the same subnet at the MSSQL servers
+    # '<ip>/<prefix>'
+    mssql_pcs_cluster_vip_cidr: ''
+
+
+    # -------------------------------------------------------------------------
+    # Tunable Parameters
+    # These can be changed to customize the deployment.
+    # -------------------------------------------------------------------------
+
     #
     # Role: Common
     # -------------------------------------------------------------------------
-
     # Host packages
     # Upgrade all the system packages.
     system_upgrade_all_packages: true
@@ -42,34 +74,6 @@ all:
     #
     # Role: MSSQL Server
     # -------------------------------------------------------------------------
-
-    # Mandatory Parameters
-    # These must be configured
-
-    # Set the SQL Server edition or product key. Possible values include:
-    #  - Evaluation
-    #  - Developer
-    #  - Express
-    #  - Web
-    #  - Standard
-    #  - Enterprise
-    #  - A product key
-    # Ref. https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-configure-environment-variables?view=sql-server-ver15
-    mssql_pid: enterprise 
-
-    # Accept the EULA confirm your acceptance of the End-User Licensing Agreement.
-    # Required setting for the SQL Server image.
-    # Ref. https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-configure-environment-variables?view=sql-server-ver15
-    # value: true/false
-    mssql_accept_eula: true
-
-    # The Virtual IP for the MSSQL AG
-    # This should an address in CIDR format on the same subnet at the MSSQL servers
-    # '<ip>/<prefix>'
-    mssql_pcs_cluster_vip_cidr: ''
-
-    # Tunable Parameters
-    # These can be changed to customize the deployment.
 
     # Accounts
     # Note:
