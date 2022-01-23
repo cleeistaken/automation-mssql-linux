@@ -7,7 +7,7 @@
 - name: Create host parameters
   set_fact:
     pcs_fqdn: "{{ pcs_fqdn | default([]) + [ item.0 ] }}"
-    pcs_mappings: "{{ pcs_mappings | default([]) + [ item.0 + ':' + item.1 ] }}"
+    pcs_mappings: "{{ pcs_mappings | default([]) + [ item.0 + ',' + item.1 ] }}"
     pcs_host_addrs: "{{ pcs_host_addrs | default([]) + [ item.0 + ' addr=' + item.2 ] }}"
   with_together:
     - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'ansible_hostname') }}"
@@ -84,7 +84,7 @@
 - name: Create fence using fence_vmware_soap
   ansible.builtin.command: >
     pcs stonith create {{ mssql_pcs_fence_name | default(default_mssql_pcs_fence_name) }} 
-    fence_vmware_soap pcmk_host_map="{{ pcs_mappings | join(';') }}" 
+    fence_vmware_rest pcmk_host_map="{{ pcs_mappings | join(';') }}" 
     ipaddr={{ vars.vcenter.host }} 
     ssl=1 
     ipport=443 
@@ -97,6 +97,11 @@
 - name: Output
   ansible.builtin.debug:
     var: result
+
+- name: stonith command verbatim
+  ansible.builtin.debug:
+    msg: >
+      pcs stonith create {{ mssql_pcs_fence_name | default(default_mssql_pcs_fence_name) }} fence_vmware_rest pcmk_host_map="{{ pcs_mappings | join(';') }}" ipaddr={{ vars.vcenter.host }} ssl=1 ipport=443 ssl_insecure=1 inet4_only=1 login={{ vars.vcenter.username }} passwd={{ vars.vcenter.password }}
 
 - name: Set pcs property stonith-enabled to true
   ansible.builtin.command: >

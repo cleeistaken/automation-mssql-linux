@@ -22,7 +22,8 @@ module "template" {
   source = "./modules/template"
 
   # vSphere Cluster
-  vsphere_cluster = var.vsphere_cluster
+  vsphere_datacenter = var.vsphere_datacenter
+  vsphere_datastore = var.vsphere_datastore
 
   # Template
   content_library_name = var.template_library_name
@@ -32,24 +33,34 @@ module "template" {
 }
 
 #
-# GFS VM
+# MSSQL VM
 #
 module "mssql-linux" {
   source = "./modules/mssql-linux"
 
-  # Clusters
-  vsphere_cluster = var.vsphere_cluster
+  # vSphere
+  vsphere_datacenter = var.vsphere_datacenter
+  vsphere_compute_cluster = var.vsphere_compute_cluster
+  vsphere_resource_pool = var.vsphere_resource_pool
+  vsphere_distributed_switch = var.vsphere_distributed_switch
+  vsphere_network_1_portgroup = var.vsphere_network_1_portgroup
+  vsphere_network_1_ipv4_subnet_cidr = var.vsphere_network_1_ipv4_subnet_cidr
+  vsphere_network_1_ipv4_ips = var.vsphere_network_1_ipv4_ips
+  vsphere_network_1_ipv4_gateway = var.vsphere_network_1_ipv4_gateway
+  vsphere_datastore = var.vsphere_datastore
+  vsphere_storage_policy = var.vsphere_storage_policy
+
+  # Network
+  network_domain_name = var.network_domain_name
+  network_ipv4_dns_servers = var.network_ipv4_dns_servers
+  network_dns_suffix = var.network_dns_suffix
 
   # Template
   template = module.template.content_library_item
   template_boot = var.template_boot
 
-  resource_pool = var.resource_pool
-
-  # Prefix for all VM
-  mssql_linux_vm_prefix = var.mssql_linux_vm_prefix
-
-  # GFS VM
-  mssql_linux_vm_count = var.mssql_linux_vm_count
-  mssql_linux_vm = var.mssql_linux_vm
+  # VM MSSQL
+  vm_mssql_prefix = var.vm_mssql_prefix
+  vm_mssql_count = var.vm_mssql_count
+  vm_mssql = var.vm_mssql
 }

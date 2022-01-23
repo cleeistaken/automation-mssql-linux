@@ -2,86 +2,28 @@
 # vSphere vCenter Server
 #
 variable vcenter_server {
-    description = "vCenter Server hostname or IP"
-    type = string
+  description = "vCenter Server hostname or IP"
+  type        = string
 }
 
 variable vcenter_user {
-    description = "vCenter Server username"
-    type = string
+  description = "vCenter Server username"
+  type        = string
 }
 
 variable vcenter_password {
-    description = "vCenter Server password"
-    type = string
+  description = "vCenter Server password"
+  type        = string
 }
 
 variable vcenter_insecure_ssl {
-    description = "Allow insecure connection to the vCenter server (unverified SSL certificate)"
-    type = bool
-    default = false
+  description = "Allow insecure connection to the vCenter server (unverified SSL certificate)"
+  type        = bool
+  default     = false
 }
 
 #
-# vSphere Cluster
-#
-variable vsphere_cluster {
-  type = object({
-    # vSphere Datacenter
-    vs_dc = string
-
-    # vSphere Cluster in the Datacenter
-    vs_cls = string
-
-    # vSphere Resource Pool
-    vs_rp = string
-
-    # vSphere Distributed Virtual Switch
-    vs_dvs = string
-
-    # vSphere Distributed Portgroup
-    vs_dvs_pg_1 = string
-
-    # Portgroup 1 IPv4 subnet in CIDR notation (e.g. 10.0.0.0/24)
-    vs_dvs_pg_1_ipv4_subnet = string
-
-    # Portgroup 1 IPv4 addresses
-    vs_dvs_pg_1_ipv4_ips = list(string)
-
-    # Portgroup 1 IPv4 gateway address
-    vs_dvs_pg_1_ipv4_gw = string
-
-    # vSphere Distributed Portgroup
-    vs_dvs_pg_2 = string
-
-    # Portgroup 2 IPv4 subnet in CIDR notation (e.g. 10.0.0.0/24)
-    vs_dvs_pg_2_ipv4_subnet = string
-
-    # Portgroup 2 IPv4 addresses
-    vs_dvs_pg_2_ipv4_ips = list(string)
-
-    # Portgroup 2 IPv4 gateway address
-    vs_dvs_pg_2_ipv4_gw = string
-
-    # vSphere vSAN datastore
-    vs_ds = string
-
-    # vSphere vSAN Storage Policy
-    vs_ds_sp = string
-
-    # Virtual machine domain name
-    vs_vm_domain = string
-
-    # Virtual Machine DNS servers
-    vs_vm_dns = list(string)
-
-    # Virtual Machine DNS suffixes
-    vs_vm_dns_suffix = list(string)
-  })
-}
-
-#
-# Template
+# Content Library and Template
 #
 variable template_library_name {
   type = string
@@ -100,37 +42,121 @@ variable template_description {
 }
 
 variable template_boot {
-  type = string
+  type    = string
   default = "efi"
 }
 
 #
+# vSphere
+#
+
+# Datacenter
+variable "vsphere_datacenter" {
+  description = "vSphere Datacenter (This resource must exist)"
+  type        = string
+  default     = "Datacenter"
+}
+
+# Cluster
+variable "vsphere_compute_cluster" {
+  description = "vSphere Cluster (This resource must exist)"
+  type        = string
+  default     = "New Cluster"
+}
+
 # Resource Pool
-#
-variable "resource_pool" {
-  type = string
+variable "vsphere_resource_pool" {
+  description = "vSphere Resource Pool (This resource will be created <---)"
+  type        = string
+  default     = "New Resource Pool"
 }
 
-
-#
-# MSSQL Linux VM
-#
-
-variable mssql_linux_vm_count {
-    type = number
-    default = 3
+# Network 1 Distributed vSwitch
+variable "vsphere_distributed_switch" {
+  description = "vSphere Distributed Switch (This resource must exist)"
+  type        = string
+  default     = "DSwitch"
 }
 
-variable mssql_linux_vm_prefix {
-    type = string
-    default = "linux"
+# Network 1 Distributed Portgroup
+variable "vsphere_network_1_portgroup" {
+  description = "vSphere Distributed Switch Portgroup 1 (This resource must exist)"
+  type        = string
+  default     = "DPortGroup"
 }
 
-variable mssql_linux_vm {
-    type = object({
-        cpu = number
-        memory_gb = number
-        os_disk_gb = number
-        data_disk_gb = number
-    })
+# Network 1 IPv4 Subnet (CIDR)
+variable "vsphere_network_1_ipv4_subnet_cidr" {
+  description = "vSphere Distributed Switch Portgroup 1 IPv4 Subnet (CIDR format)"
+  type        = string
+}
+
+# Network 1 IPv4 IP List
+variable "vsphere_network_1_ipv4_ips" {
+  description = "vSphere Distributed Switch Portgroup 1 IPv4 IP list"
+  type        = list(string)
+}
+
+# Network 1 IPv4 IP Gateway
+variable "vsphere_network_1_ipv4_gateway" {
+  description = "vSphere Distributed Switch Portgroup 1 IPv4 Gateway"
+  type        = string
+}
+
+# Datastore
+variable "vsphere_datastore" {
+  description = "vSphere Datastore (This resource must exist)"
+  type        = string
+  default     = "vsanDatastore"
+}
+
+# Storage Policy
+variable "vsphere_storage_policy" {
+  description = "vSphere Datastore Storage Policy (This resource must exist)"
+  type        = string
+  default     = "vSAN Default Storage Policy"
+}
+
+# Domain Name
+variable "network_domain_name" {
+  description = "Domain name to be appended to the hostname"
+  type        = string
+}
+
+# DNS Servers
+variable "network_ipv4_dns_servers" {
+  description = "List of DNS servers"
+  type        = list(string)
+  default     = ["8.8.8.8", "8.8.4.4"]
+}
+
+# DNS Suffixes
+variable "network_dns_suffix" {
+  description = "List of DNS suffixes"
+  type        = list(string)
+  default     = []
+}
+
+#
+# VM MSSQL
+#
+variable "vm_mssql_prefix" {
+  description = "VM prefix"
+  type        = string
+  default     = "mssql"
+}
+
+variable "vm_mssql_count" {
+  description = "Number of MSSQL VM"
+  type        = number
+  default     = 3
+}
+
+variable "vm_mssql" {
+  type = object({
+    cpu          = number
+    memory_gb    = number
+    os_disk_gb   = number
+    data_disk_gb = number
+  })
 }
