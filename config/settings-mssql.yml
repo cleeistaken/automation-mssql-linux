@@ -2,7 +2,7 @@
 all:
   vars:
     # -------------------------------------------------------------------------
-    # Mandatory Parameters
+    # MANDATORY Parameters
     # Te variables in this section must be configured
     # -------------------------------------------------------------------------
 
@@ -15,22 +15,30 @@ all:
     #  - Enterprise
     #  - A product key
     # Ref. https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-configure-environment-variables?view=sql-server-ver15
-    mssql_pid: enterprise
+    #
+    # Standard: AG cluster with up to 3 replica. The vm_mssql_count in terraforms-mssql.tfvars
+    #           should be set to 3 accordingly.
+    # Enterprise: AG cluster with up to 9 replicas. The vm_mssql_count in terraforms-mssql.tfvars
+    #             can be set up either to 3 or 5.
+    # Evaluation: For testing purpose, this value is recommended. The vm_mssql_count in
+    #             terraforms-mssql.tfvars can be set up either to 3 or 5.
+    mssql_pid: 'Evaluation'
 
     # Accept the EULA confirm your acceptance of the End-User Licensing Agreement.
-    # Required setting for the SQL Server image.
+    # Required setting for the SQL Server image. If set to false, the deployment
+    # will immediately fail.
     # Ref. https://docs.microsoft.com/en-us/sql/linux/sql-server-linux-configure-environment-variables?view=sql-server-ver15
     # value: true/false
-    mssql_accept_eula: true
+    mssql_accept_eula: false
 
     # The Virtual IP for the MSSQL AG
-    # This should an address in CIDR format on the same subnet at the MSSQL servers
+    # This should an address in CIDR format on the same subnet at the MSSQL servers.
     # '<ip>/<prefix>'
     mssql_pcs_cluster_vip_cidr: ''
 
 
     # -------------------------------------------------------------------------
-    # Tunable Parameters
+    # TUNABLE Parameters
     # These can be changed to customize the deployment.
     # -------------------------------------------------------------------------
 
@@ -73,6 +81,8 @@ all:
 
     #
     # Role: MSSQL Server
+    # The commented variables reflect the default values. If left commented the
+    # default values will be used.
     # -------------------------------------------------------------------------
 
     # Accounts

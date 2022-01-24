@@ -5,7 +5,11 @@ This project deploys a Microsoft SQL Server AG cluster with Pacemaker and stonit
 ## Requirements
 The code was tested using the following versions.
 
-### System
+### vSphere Environment
+* vSphere 6.7U3 (6.7.0.47000)
+* vSphere 7.0
+
+### Automation System
 * Python 3.6.8
 * Terraform v1.1.3
 * CentOS 8.5
@@ -13,6 +17,9 @@ The code was tested using the following versions.
 ### Python 3 packages
 * ansible 4.10.0
 * ansible-core 2.11.7 
+
+### MSSQL VM Template
+* Ubuntu 20.04.03 
 
 ## Procedure
 

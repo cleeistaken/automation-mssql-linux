@@ -78,7 +78,9 @@ network_dns_suffix = []
 # The prefix for the VM create in the
 vm_mssql_prefix = "mssql-linux"
 
-# The number of MSSQL VM to create. Should be 3 or 5.
+# The number of MSSQL VM to create.
+# Currently this project only support nodes counts of 3 or 5. The SQL Server Linux AG
+# replica are configured with the synchronized commit option.
 vm_mssql_count = 3
 
 # The VM hardware configuration
