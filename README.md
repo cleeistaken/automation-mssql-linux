@@ -23,7 +23,7 @@ The code was tested using the following versions.
 
 ## Procedure
 
-### Deploy
+### Configure
 1. Login as ***root***
 
 2. Edit the **terraform-mssql.tfvars** file. This file contains information about the vSphere environment. This is the primary files used by Terraform.
@@ -47,7 +47,16 @@ The code was tested using the following versions.
    ./validate.sh
    ```
 
-5. Deploy the environment.
+### Deploy
+1. Login as ***root***
+
+2. Validate the settings.
+   ```console
+   cd /opt/automation/automation-mssql-linux/
+   ./validate.sh
+   ```
+
+3. Deploy the environment.
    ```console
    cd /opt/automation/automation-mssql-linux/
    ./deploy.sh
@@ -56,7 +65,7 @@ The code was tested using the following versions.
 ### Destroy
 1. Login as ***root*** 
 
-2. Edit the **terraform-mssql.tfvars** file. This file contains information about the vSphere environment. This is the primary files used by Terraform.
+2. Destroy the environment.
     ```console
     cd /opt/automation/automation-mssql-linux/
     ./destroy.sh
