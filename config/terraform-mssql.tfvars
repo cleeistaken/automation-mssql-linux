@@ -28,6 +28,10 @@ vsphere_datacenter = "Datacenter"
 # This resource must exist.
 vsphere_compute_cluster = "Cluster"
 
+# vSphere VM Folder containing the created VM.
+# This resource must not exist and will be created by Terraform. <---
+vsphere_folder_vm = "mssql"
+
 # vSphere Resource Pool where the VM will be created.
 # This resource must not exist and will be created by Terraform. <---
 vsphere_resource_pool = "mssql"

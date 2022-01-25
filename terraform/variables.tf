@@ -64,6 +64,7 @@ variable "vsphere_compute_cluster" {
   default     = "New Cluster"
 }
 
+# VM Folder
 variable "vsphere_folder_vm" {
   description = "vSphere VM folder (This resource will be created <---)"
   type = string
