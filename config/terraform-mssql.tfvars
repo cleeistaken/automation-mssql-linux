@@ -60,10 +60,6 @@ vsphere_network_1_ipv4_gateway = "10.0.0.1"
 # This resource must exist and have sufficient available capacity.
 vsphere_datastore = "vsanDatastore"
 
-# Datastore Storage Policy
-# This resource must exist.
-vsphere_storage_policy = "vSAN Default Storage Policy"
-
 #
 # Network
 #

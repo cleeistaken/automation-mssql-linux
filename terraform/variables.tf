@@ -117,13 +117,6 @@ variable "vsphere_datastore" {
   default     = "vsanDatastore"
 }
 
-# Storage Policy
-variable "vsphere_storage_policy" {
-  description = "vSphere Datastore Storage Policy (This resource must exist)"
-  type        = string
-  default     = "vSAN Default Storage Policy"
-}
-
 # Domain Name
 variable "network_domain_name" {
   description = "Domain name to be appended to the hostname"

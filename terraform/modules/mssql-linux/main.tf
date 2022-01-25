@@ -26,10 +26,6 @@ data "vsphere_datastore" "vsphere_datastore_1" {
   datacenter_id = data.vsphere_datacenter.vsphere_datacenter_1.id
 }
 
-data "vsphere_storage_policy" "vsphere_storage_policy_1" {
-  name = var.vsphere_storage_policy
-}
-
 data "vsphere_distributed_virtual_switch" "vsphere_distributed_virtual_switch_1" {
   name          = var.vsphere_distributed_switch
   datacenter_id = data.vsphere_datacenter.vsphere_datacenter_1.id
@@ -62,7 +58,6 @@ resource "vsphere_virtual_machine" "mssql_linux_vm" {
 
   # Datastore and Storage Policy
   datastore_id      = data.vsphere_datastore.vsphere_datastore_1.id
-  storage_policy_id = data.vsphere_storage_policy.vsphere_storage_policy_1.id
 
   num_cpus = var.vm_mssql.cpu
   memory   = var.vm_mssql.memory_gb * 1024
@@ -90,7 +85,6 @@ resource "vsphere_virtual_machine" "mssql_linux_vm" {
     content {
       label             = format("%s-%02d-%s-disk%d", var.vm_mssql_prefix, (count.index + 1), "data", (disk.value + 1))
       size              = var.vm_mssql.data_disk_gb
-      storage_policy_id = data.vsphere_storage_policy.vsphere_storage_policy_1.id
       unit_number       = 15 + ((disk.value % 3) * 14) + disk.value
     }
   }

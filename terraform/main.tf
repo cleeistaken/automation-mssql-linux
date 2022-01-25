@@ -49,7 +49,6 @@ module "mssql-linux" {
   vsphere_network_1_ipv4_ips = var.vsphere_network_1_ipv4_ips
   vsphere_network_1_ipv4_gateway = var.vsphere_network_1_ipv4_gateway
   vsphere_datastore = var.vsphere_datastore
-  vsphere_storage_policy = var.vsphere_storage_policy
 
   # Network
   network_domain_name = var.network_domain_name
