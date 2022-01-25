@@ -5,6 +5,12 @@ data "vsphere_datacenter" "vsphere_datacenter_1" {
   name = var.vsphere_datacenter
 }
 
+resource "vsphere_folder" "vsphere_folder_1" {
+  path          = var.vsphere_folder_vm
+  type          = "vm"
+  datacenter_id = data.vsphere_datacenter.vsphere_datacenter_1.id
+}
+
 data "vsphere_compute_cluster" "vsphere_compute_cluster_1" {
   name          = var.vsphere_compute_cluster
   datacenter_id = data.vsphere_datacenter.vsphere_datacenter_1.id
@@ -47,6 +53,9 @@ resource "vsphere_virtual_machine" "mssql_linux_vm" {
 
   # Template boot mode (efi or bios)
   firmware = var.template_boot
+
+  # VM Folder
+  folder = vsphere_folder.vsphere_folder_1.path
 
   # Resource pool for created VM
   resource_pool_id = vsphere_resource_pool.vsphere_resource_pool_1.id
