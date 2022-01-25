@@ -67,7 +67,7 @@ variable "vsphere_compute_cluster" {
 variable "vsphere_folder_vm" {
   description = "vSphere VM folder (This resource will be created <---)"
   type = string
-  default = 'mssql-linux'
+  default = "mssql-linux"
 }
 
 # Resource Pool
