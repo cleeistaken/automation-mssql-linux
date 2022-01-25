@@ -53,7 +53,7 @@ variable "vsphere_storage_policy" {
 
 variable "vsphere_folder_vm" {
   type = string
-  default = 'mssql-linux'
+  default = "mssql-linux"
 }
 
 #
