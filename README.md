@@ -73,12 +73,6 @@ The code was tested using the following versions.
 
 
 ## Known Issues / Limitations
-* A failed deployment may leave incompletely created resources in vCenter. If this happens both deployment and destruction may fail. If this happens manually it is necessary to delete the following resources in vCenter:
-  * Content library (default: **Content Library MSSQL**)
-  * Virtual machines (default: **mssql-linux-xx**)
-  * Resource pool (default: **mssql**)
-
-
 * Terraform resource pool creation will fail if VMware Distributed Resource Scheduler DRS is not enabled on the cluster. 
 
   https://www.vmware.com/products/vsphere/drs-dpm.html
@@ -90,3 +84,22 @@ The code was tested using the following versions.
 
   https://github.com/hashicorp/terraform-provider-vsphere/issues/388
 
+
+* Deployments to an NFS datastore may fail at various stages. This issue is under investigation. For the time being it is recommended to deploy to a vSAN, FC, or iSCSI datastore. 
+
+## Troubleshooting
+* After a failed deployment trying to deploy again may generate the following error. If this happens it is necessary to destroy, revalidate, and try the deployment again.
+    ```
+    Applying Terraform using tfplan
+    ╷
+    │ Error: Saved plan is stale
+    │
+    │ The given plan file can no longer be applied because the state was changed by another operation after the plan was
+    │ created.
+    ```
+
+* A failed deployment may leave incompletely created resources in vCenter. If this happens both deployment and destruction may fail. If this happens it is necessary to manually delete the following resources in vCenter:
+  * Content library (default: **Content Library MSSQL**)
+  * Virtual machine folder (default: **mssql**)
+  * Virtual machines (default: **mssql-linux-xx**)
+  * Resource pool (default: **mssql**)
