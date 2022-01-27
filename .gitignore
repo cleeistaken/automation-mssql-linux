@@ -5,6 +5,7 @@ config/terraform.tfvars
 config/terraform-template.tfvars
 config/settings.yml
 config/settings-template.yml
+terraform/tfplan
 
 # jetbrains
 .idea/*
