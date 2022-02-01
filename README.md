@@ -1,6 +1,6 @@
 # Microsoft SQL Server AG with Pacemaker
 
-This project deploys a Microsoft SQL Server AG cluster with Pacemaker and stonith fence.
+This project deploys a Microsoft SQL Server on Linux cluster, using Always On Availability Group, with Pacemaker, Corosync and the STONITH fencing component (vmw_fence_rest).
 
 ## Use Case
 Microsoft SQL Server on Linux is a version of the well-known enterprise-grade RDBM from Microsoft. Unlike the traditional Microsoft SQL Server, this version runs entirely on the Linux Operating System platforms.
@@ -119,3 +119,6 @@ The code was tested using the following Tools, OSes, and Application versions. A
   * Virtual machine folder (default: **mssql**)
   * Virtual machines (default: **mssql-linux-xx**)
   * Resource pool (default: **mssql**)
+
+
+* An issue with **vmw_fence_rest** STONITH configuration parameters. We observed that, on some vSphere Versions (e.g. 6.7.0 - Build 18010599), the value supplied for “vcenter_server” must be the IP address of the vCenter Server. Specifying the FQDN of the vCenter Server results in failed STONITH configuration.
