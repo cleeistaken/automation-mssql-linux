@@ -46,7 +46,7 @@ The recommended method run this code is using our preconfigured ova template. Th
    https://storage.googleapis.com/workload-automation/templates/testbench-1.1.ova
 
 
-2. Deploy the template and setting the following
+2. Deploy the template. During the deployment configure the following:
    * root password
    * DHCP or Static network configuration
    * IPv4 parameters (if Static network configuration)
