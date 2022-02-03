@@ -38,6 +38,18 @@ The code was tested using the following Tools, OSes, and Application versions. A
 * Ubuntu 20.04.03 
 
 ## Procedure
+The recommended method run this code is using our preconfigured ova template. The template is built on a minimal Centos Stream 9 Linux distribution and contains all the required packages, including the Ubuntu 20.04.03 template used to create the MSSQL VMs.
+
+### Appliance
+1. Download the .OVA template.
+
+   https://storage.googleapis.com/workload-automation/templates/testbench-1.1.ova
+
+
+2. Deploy the template and setting the following
+   * root password
+   * DHCP or Static network configuration
+   * IPv4 parameters (if Static network configuration)
 
 ### Configure
 1. Login as ***root***
@@ -63,7 +75,7 @@ The code was tested using the following Tools, OSes, and Application versions. A
    ./validate.sh
    ```
 
-### Deploy
+#### Deploy
 1. Login as ***root***
 
 2. Validate the settings.
@@ -78,7 +90,7 @@ The code was tested using the following Tools, OSes, and Application versions. A
    ./deploy.sh
    ```
 
-### Destroy
+#### Destroy
 1. Login as ***root*** 
 
 2. Destroy the environment.
