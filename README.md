@@ -15,11 +15,11 @@ The Solution presented in this Package includes all the necessary configuration 
 
 This Package is released without any guarantee of fit or official support. It is not intended to replace any corporate administrative practices, nor are the deployed VMs expected to be used for Production workloads without undergoing additional rigorous auditing and configurations deemed necessary by the end-user.
 
-Our hope is that the Package will serve as a useful starting point and building block for all Microsoft SQL Server Administrators who may have been struggling with getting similar Solutions successfully deployed or have been wondering if it’s “doable on vSphere”.
+We hope this Package will serve as a useful starting point and building block for all Microsoft SQL Server Administrators who may have been struggling with getting similar Solutions successfully deployed or have been wondering if it’s “doable on vSphere”.
 
 
 ## Requirements
-The code was tested using the following Tools, OSes, and Application versions. Although not extensively tested these scripts may work with other versions.
+The code was tested using the following Tools, OSes, and Application versions. Although not extensively tested, these scripts may work with other versions.
 
 ### vSphere Environment
 * vSphere 6.7U3 (6.7.0.47000)
@@ -38,7 +38,7 @@ The code was tested using the following Tools, OSes, and Application versions. A
 * Ubuntu 20.04.03 
 
 ## Procedure
-The recommended method run this code is using our preconfigured ova template. The template is built on a minimal Centos Stream 9 Linux distribution and contains all the required packages, including the Ubuntu 20.04.03 template used to create the MSSQL VMs.
+The recommended method of running this code is using our preconfigured ova template. The template is built on a minimal Centos Stream 9 Linux distribution and contains all the required packages, including the Ubuntu 20.04.03 template used to create the MSSQL VMs.
 
 ### Appliance
 1. Download the .OVA template.
@@ -60,7 +60,7 @@ The recommended method run this code is using our preconfigured ova template. Th
     vi terraform-mssql.tfvars
     ```   
 
-3. Edit the **settings-mssql.yml** file. This file contains information about the MSSQL cluster to be created. The is the primary file used by Ansible. 
+3. Edit the **settings-mssql.yml** file. This file contains information about the MSSQL cluster to be created. This is the primary file used by Ansible. 
    * ***mssql_pid***
    * ***mssql_accept_eula*** 
    * ***mssql_pcs_cluster_vip_cidr***
@@ -116,7 +116,7 @@ The recommended method run this code is using our preconfigured ova template. Th
 * Deployments to an NFS datastore may fail at various stages. This issue is under investigation. For the time being it is recommended to deploy to a vSAN, FC, or iSCSI datastore. 
 
 ## Troubleshooting
-* After a failed deployment trying to deploy again may generate the following error. If this happens it is necessary to destroy, revalidate, and try the deployment again.
+* After a failed deployment, trying to deploy again may generate the following error. If this happens, it is necessary to destroy, revalidate, and try the deployment again.
     ```
     Applying Terraform using tfplan
     ╷
@@ -134,3 +134,11 @@ The recommended method run this code is using our preconfigured ova template. Th
 
 
 * An issue with **vmw_fence_rest** STONITH configuration parameters. We observed that, on some vSphere Versions (e.g. 6.7.0 - Build 18010599), the value supplied for “vcenter_server” must be the IP address of the vCenter Server. Specifying the FQDN of the vCenter Server results in failed STONITH configuration.
+
+##Authors
+
+* Deji Akomolafe is a VMware Staff Solutions Architect that specializes in the virtualization of Microsoft Business Critical Applications on VMware's vSphere.
+
+* Mark Xu is a VMware Solutions Architect that specializes in Business Critical Applications Solutions on VMware's vSphere.
+
+* Charles Lee is a VMware Senior Solutions Architect that specializes in Business Critical Application and Automation on VMware's vSphere.
