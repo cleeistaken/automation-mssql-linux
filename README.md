@@ -135,7 +135,7 @@ The recommended method of running this code is using our preconfigured ova templ
 
 * An issue with **vmw_fence_rest** STONITH configuration parameters. We observed that, on some vSphere Versions (e.g. 6.7.0 - Build 18010599), the value supplied for “vcenter_server” must be the IP address of the vCenter Server. Specifying the FQDN of the vCenter Server results in failed STONITH configuration.
 
-##Authors
+## Authors
 
 * Deji Akomolafe is a VMware Staff Solutions Architect that specializes in the virtualization of Microsoft Business Critical Applications on VMware's vSphere.
 
