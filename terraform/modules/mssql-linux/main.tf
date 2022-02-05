@@ -37,6 +37,11 @@ data "vsphere_network" "vsphere_network_1" {
   distributed_virtual_switch_uuid = data.vsphere_distributed_virtual_switch.vsphere_distributed_virtual_switch_1.id
 }
 
+locals {
+  disks = [var.vm_mssql.data_disk_gb, var.vm_mssql.log_disk_gb]
+}
+
+
 #
 # MSSQL Linux
 #
@@ -80,11 +85,11 @@ resource "vsphere_virtual_machine" "mssql_linux_vm" {
   # scsi2:0-14 are unit numbers 30-44
   # scsi3:0-14 are unit numbers 45-59
   dynamic "disk" {
-    for_each = range(0, 1)
+    for_each = range(0, length(local.disks))
 
     content {
       label             = format("%s-%02d-%s-disk%d", var.vm_mssql_prefix, (count.index + 1), "data", (disk.value + 1))
-      size              = var.vm_mssql.data_disk_gb
+      size              = local.disks[count.index]
       unit_number       = 15 + ((disk.value % 3) * 14) + disk.value
     }
   }

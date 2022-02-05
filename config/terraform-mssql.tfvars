@@ -89,4 +89,5 @@ vm_mssql = {
     memory_gb = 32     # Amount of RAM in GB
     os_disk_gb = 60    # Size of the OS disk
     data_disk_gb = 100 # Size of the disk where the MSSQL data will reside
+    log_disk_gb  = 40  # Size of the disk where the MSSQL log will reside
 }

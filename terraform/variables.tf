@@ -158,5 +158,6 @@ variable "vm_mssql" {
     memory_gb    = number
     os_disk_gb   = number
     data_disk_gb = number
+    log_disk_gb  = number
   })
 }
