@@ -38,7 +38,7 @@ data "vsphere_network" "vsphere_network_1" {
 }
 
 locals {
-  disks = [var.vm_mssql.data_disk_gb, var.vm_mssql.log_disk_gb]
+  disks = tolist([var.vm_mssql.data_disk_gb, var.vm_mssql.log_disk_gb])
 }
 
 
