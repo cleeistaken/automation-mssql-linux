@@ -72,7 +72,7 @@ resource "vsphere_virtual_machine" "mssql_linux_vm" {
     ovf_mapping = "eth0"
   }
 
-  scsi_controller_count = 2
+  scsi_controller_count = 3
 
   disk {
     label       = format("%s-%02d-os-disk0", var.vm_mssql_prefix, count.index + 1)
