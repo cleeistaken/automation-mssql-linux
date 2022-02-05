@@ -56,7 +56,7 @@
     opts: "{{ system_mount_data_disk_mount_options | default(default_system_mount_data_disk_mount_options) }}"
     state: mounted
     fstype: "{{ system_mount_data_disks_filesystem | default(default_system_mount_data_disks_filesystem) }}"
-  when: (disks is defined and item not in mounted_devices) and data_disk_mount_paths is defined
+  when: (disks is defined and item not in mounted_devices) and (system_mount_data_disk_mount_paths | default(default_system_mount_data_disk_mount_paths))g is defined
   loop: "{{ disks }}"
   loop_control:
     index_var: index
