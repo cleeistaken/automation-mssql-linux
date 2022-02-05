@@ -21,8 +21,9 @@ default_system_extend_os_lvm_device: /dev/sda
 # Data disks
 default_system_mount_data_disks: false
 default_system_mount_data_disks_filesystem: xfs
-default_system_mount_options: noatime
-default_system_mount_paths: ['/mnt/data']
+default_system_mount_data_disk_mount_options: noatime
+default_system_mount_data_disk_mount_paths: ['/mnt/data']
+
 
 # User parameters
 default_system_create_account: false
