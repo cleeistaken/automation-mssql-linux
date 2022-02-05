@@ -89,7 +89,7 @@ resource "vsphere_virtual_machine" "mssql_linux_vm" {
 
     content {
       label             = format("%s-%02d-%s-disk%d", var.vm_mssql_prefix, (count.index + 1), "data", (disk.value + 1))
-      size              = var.vm_mssql.data_disk_gb
+      size              = local.disks[count.index]
       unit_number       = 15 + ((disk.value % 3) * 14) + disk.value
     }
   }
