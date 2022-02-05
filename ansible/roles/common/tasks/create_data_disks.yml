@@ -8,7 +8,7 @@
   ansible.builtin.debug:
     msg: |
       Filesystem: {{ system_data_disk_filesystem | default(default_system_mount_data_disks_filesystem) }}
-      Mount paths: {{ system_mount_paths | default(default_system_mount_paths) }}
+      Mount paths: {{ system_mount_data_disk_mount_paths | default(default_system_mount_data_disk_mount_paths) }}
       Mount options: {{ system_mount_options | default(default_system_mount_options) }}
 
 - name: Get disks (/dev/sd*) except sda (OS)
@@ -23,7 +23,7 @@
 - name: Validate sufficent paths specified
   assert:
     that: disks | length <= (system_mount_data_disk_mount_paths | default(default_system_mount_data_disk_mount_paths)) | length
-    fail_msg: "There are {{ disks | length }} data disks but {{ (system_mount_paths | default(default_system_mount_paths)) | length }} mount points specified"
+    fail_msg: "There are {{ disks | length }} data disks but {{ system_mount_data_disk_mount_paths | default(default_system_mount_data_disk_mount_paths) }} mount points specified"
     success_msg: "There are enough specified mount paths"
 
 - name: Get currently mounted devices
@@ -44,7 +44,7 @@
 
 - name: Create filesystem
   filesystem:
-    fstype: "{{ system_data_disk_filesystem | default(default_system_mount_data_disks_filesystem) }}"
+    fstype: "{{ system_mount_data_disks_filesystem | default(default_system_mount_data_disks_filesystem) }}"
     dev: "{{ item }}1"
   when: disks is defined and item not in mounted_devices
   loop: "{{ disks }}"
@@ -52,10 +52,10 @@
 - name: Mount data volumes using specified mount points
   mount:
     src: "{{ item }}1"
-    path: "{{ (system_mount_paths | default(default_system_mount_paths))[index] }}"
-    opts: "{{ system_mount_options | default(default_system_mount_options) }}"
+    path: "{{ (system_mount_data_disk_mount_paths | default(default_system_mount_data_disk_mount_paths))[index] }}"
+    opts: "{{ system_mount_data_disk_mount_options | default(default_system_mount_data_disk_mount_options) }}"
     state: mounted
-    fstype: "{{ system_data_disk_filesystem | default(default_system_mount_data_disks_filesystem) }}"
+    fstype: "{{ system_mount_data_disks_filesystem | default(default_system_mount_data_disks_filesystem) }}"
   when: (disks is defined and item not in mounted_devices) and data_disk_mount_paths is defined
   loop: "{{ disks }}"
   loop_control:
