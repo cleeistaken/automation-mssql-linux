@@ -38,7 +38,7 @@ data "vsphere_network" "vsphere_network_1" {
 }
 
 locals {
-  disks = [var.vm_mssql.data_disk_gb, var.vm_mssql.log_disk_gb]
+  disks = tolist([var.vm_mssql.data_disk_gb, var.vm_mssql.log_disk_gb])
 }
 
 
@@ -72,7 +72,7 @@ resource "vsphere_virtual_machine" "mssql_linux_vm" {
     ovf_mapping = "eth0"
   }
 
-  scsi_controller_count = 2
+  scsi_controller_count = max(1, min(4, length(local.disks) + 1))
 
   disk {
     label       = format("%s-%02d-os-disk0", var.vm_mssql_prefix, count.index + 1)
@@ -84,12 +84,12 @@ resource "vsphere_virtual_machine" "mssql_linux_vm" {
   # scsi1:0-14 are unit numbers 15-29
   # scsi2:0-14 are unit numbers 30-44
   # scsi3:0-14 are unit numbers 45-59
-  dynamic "disk" {
+   dynamic "disk" {
     for_each = range(0, length(local.disks))
 
     content {
       label             = format("%s-%02d-%s-disk%d", var.vm_mssql_prefix, (count.index + 1), "data", (disk.value + 1))
-      size              = local.disks[count.index]
+      size              = local.disks[disk.value]
       unit_number       = 15 + ((disk.value % 3) * 14) + disk.value
     }
   }
