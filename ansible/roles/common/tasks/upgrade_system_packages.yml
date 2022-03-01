@@ -23,6 +23,7 @@
 - name: Upgrade all packages Ubuntu or Debian
   apt:
     upgrade: dist
+    update_cache: yes
     force_apt_get: yes
   when: ansible_distribution == 'Debian' or 
         ansible_distribution == 'Ubuntu'
