@@ -71,7 +71,7 @@ all:
     # Data Disk(s)
     system_mount_data_disks: true
     system_mount_data_disks_filesystem: xfs
-    system_mount_data_disk_mount_paths: ['/sqlnux']
+    system_mount_data_disk_mount_paths: ['/sqlnux', '/sqlnux/log']
 
     # User
     system_create_account: true
