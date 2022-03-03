@@ -47,11 +47,11 @@
 
 #
 # Create the MSSQL Availability Group on the Primary Node
-# we might need to switc the first item to hostname and second to fqdn
+# we might need to switch the first item to hostname and second to fqdn
 - name: Build node parameters
   set_fact:
     ag_node_parameters: >
-      {{ ag_node_parameters | default("") }}N'{{ item.0 }}' WITH (ENDPOINT_URL = N'tcp://{{ item.1 }}:{{ mssql_endpoint_listener_port | default(default_mssql_endpoint_listener_port) }}', AVAILABILITY_MODE = {{ 'SYNCHRONOUS_COMMIT' if index < 3 else 'ASYNCHRONOUS_COMMIT' }}, FAILOVER_MODE = EXTERNAL, SEEDING_MODE = AUTOMATIC)
+      {{ ag_node_parameters | default("") }}N'{{ item.0 }}' WITH (ENDPOINT_URL = N'tcp://{{ item.1 }}:{{ mssql_endpoint_listener_port | default(default_mssql_endpoint_listener_port) }}', AVAILABILITY_MODE = {{ 'SYNCHRONOUS_COMMIT' if index < 3 else 'ASYNCHRONOUS_COMMIT' }}, FAILOVER_MODE = EXTERNAL, SEEDING_MODE = AUTOMATICBACKUP_PRIORITY = 50, SECONDARY_ROLE(ALLOW_CONNECTIONS = READ_ONLY)
   with_together:
     - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'ansible_hostname') | list }}"
     - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'ansible_fqdn') | list }}"
@@ -65,7 +65,7 @@
     -s localhost 
     -U SA 
     -P "{{ mssql_sa_password | default(default_mssql_sa_password) }}"
-    -Q "IF NOT EXISTS (SELECT name FROM master.sys.availability_groups WHERE name = '{{ mssql_ag_name | default(default_mssql_ag_name) }}') BEGIN CREATE AVAILABILITY GROUP [{{ mssql_ag_name | default(default_mssql_ag_name) }}] WITH (DB_FAILOVER = ON, CLUSTER_TYPE = EXTERNAL) FOR REPLICA ON {{  ag_node_parameters.splitlines() | join(',') }}; ALTER AVAILABILITY GROUP [{{ mssql_ag_name | default(default_mssql_ag_name) }}] GRANT CREATE ANY DATABASE END;"
+    -Q "IF NOT EXISTS (SELECT name FROM master.sys.availability_groups WHERE name = '{{ mssql_ag_name | default(default_mssql_ag_name) }}') BEGIN CREATE AVAILABILITY GROUP [{{ mssql_ag_name | default(default_mssql_ag_name) }}] WITH (DB_FAILOVER = ON, CLUSTER_TYPE = EXTERNAL, DTC_SUPPORT = NONE, AUTOMATED_BACKUP_PREFERENCE = SECONDARY_ONLY, REQUIRED_SYNCHRONIZED_SECONDARIES_TO_COMMIT = 1) FOR REPLICA ON {{  ag_node_parameters.splitlines() | join(',') }}; ALTER AVAILABILITY GROUP [{{ mssql_ag_name | default(default_mssql_ag_name) }}] GRANT CREATE ANY DATABASE END;"
   register: result
   when: inventory_hostname == play_hosts[0]
 
