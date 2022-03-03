@@ -51,7 +51,7 @@
 - name: Build node parameters
   set_fact:
     ag_node_parameters: >
-      {{ ag_node_parameters | default("") }}N'{{ item.0 }}' WITH (ENDPOINT_URL = N'tcp://{{ item.1 }}:{{ mssql_endpoint_listener_port | default(default_mssql_endpoint_listener_port) }}', AVAILABILITY_MODE = {{ 'SYNCHRONOUS_COMMIT' if index < 3 else 'ASYNCHRONOUS_COMMIT' }}, FAILOVER_MODE = EXTERNAL, SEEDING_MODE = AUTOMATICBACKUP_PRIORITY = 50, SECONDARY_ROLE(ALLOW_CONNECTIONS = READ_ONLY)
+      {{ ag_node_parameters | default("") }}N'{{ item.0 }}' WITH (ENDPOINT_URL = N'tcp://{{ item.1 }}:{{ mssql_endpoint_listener_port | default(default_mssql_endpoint_listener_port) }}', AVAILABILITY_MODE = {{ 'SYNCHRONOUS_COMMIT' if index < 3 else 'ASYNCHRONOUS_COMMIT' }}, FAILOVER_MODE = EXTERNAL, SEEDING_MODE = AUTOMATIC, BACKUP_PRIORITY = 50, SECONDARY_ROLE(ALLOW_CONNECTIONS = READ_ONLY)
   with_together:
     - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'ansible_hostname') | list }}"
     - "{{ groups['mssql_linux_vm'] | map('extract', hostvars, 'ansible_fqdn') | list }}"
