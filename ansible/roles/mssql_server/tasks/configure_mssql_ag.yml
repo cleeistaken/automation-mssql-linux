@@ -69,6 +69,10 @@
   register: result
   when: inventory_hostname == play_hosts[0]
 
+- name: Output
+  ansible.builtin.debug:
+    var: result
+
 #
 # Join the MSSQL Availability Group on the Secondary Nodes
 #
