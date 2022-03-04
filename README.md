@@ -43,7 +43,7 @@ The recommended method of running this code is using our preconfigured ova templ
 ### Appliance
 1. Download the .OVA template.
 
-   https://storage.googleapis.com/workload-automation/templates/testbench-1.2.ova
+   https://storage.googleapis.com/workload-automation/templates/testbench-1.2.1.ova
 
 
 2. Deploy the template. During the deployment configure the following:
@@ -144,7 +144,7 @@ The recommended method of running this code is using our preconfigured ova templ
 * Charles Lee is a VMware Senior Solutions Architect that specializes in Business Critical Application and Automation on VMware's vSphere.
 
 
-## OVA Changelog
+# Changelog
 ### 1.0 
 * Initial release.
 
@@ -156,3 +156,12 @@ The recommended method of running this code is using our preconfigured ova templ
 * Add anti-affinity rule for MSSQL VM
 * Add second disk to the MSSQL VM and use it as the log disk
 * Fixed ansible apt update statement failing because of an upstream repository change
+
+### 1.2.1
+* Add parameters to the AG creation
+  * DTC_SUPPORT = NONE
+  * AUTOMATED_BACKUP_PREFERENCE = SECONDARY_ONLY
+  * REQUIRED_SYNCHRONIZED_SECONDARIES_TO_COMMIT = 1
+  * BACKUP_PRIORITY = 50
+  * SECONDARY_ROLE(ALLOW_CONNECTIONS = READ_ONLY)
+
