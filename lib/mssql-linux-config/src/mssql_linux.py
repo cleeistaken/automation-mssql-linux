@@ -318,9 +318,7 @@ class MssqlLinux(ConfigBase):
                     print("ERROR")
                 vip = self.ansible.mssql_pcs_cluster_vip_cidr
                 subnet = self.terraform.vsphere_network_1_ipv4_subnet_cidr
-                errors.append(
-                    f"MSSQL pacemaker VIP '{vip}' is not in {subnet}."
-                )
+                errors.append(f"MSSQL pacemaker VIP '{vip}' is not in {subnet}.")
             else:
                 if self.verbose:
                     print("OK")
@@ -343,7 +341,7 @@ class MssqlLinux(ConfigBase):
 
         return errors
 
-    def validate(self, verbose: bool = True) -> List[str]:
+    def validate(self) -> List[str]:
         errors = []
         try:
             errors.extend(self.terraform.validate())

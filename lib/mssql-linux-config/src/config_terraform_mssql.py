@@ -481,9 +481,7 @@ class ConfigTerraformMssql(ConfigBase):
                         print("ERROR")
                     pg = self.vsphere_network_1_portgroup
                     cluster = self.vsphere_compute_cluster
-                    errors.append(
-                        f"Could not find network: '{pg}' in '{cluster}'"
-                    )
+                    errors.append(f"Could not find network: '{pg}' in '{cluster}'")
                     return errors
 
                 # Hosts

@@ -20,11 +20,11 @@ def cli():
 @click.option("-v", "--verbose", is_flag=True)
 def mssql_prompt(ansible: str, terraform: str, verbose: bool):
     try:
-        tc = MssqlLinux()
+        tc = MssqlLinux(verbose=verbose)
         tc.prompt()
 
         print("Validating the configuration parameters.")
-        errors = tc.validate(verbose=verbose)
+        errors = tc.validate()
         if not errors:
             print("Configuration is valid.")
         else:
@@ -52,6 +52,8 @@ def mssql_validate(ansible: str, terraform: str, verbose: bool):
     try:
         tc = MssqlLinux(verbose=verbose)
         tc.open(terraform_file=terraform, ansible_file=ansible)
+
+        print("Validating the configuration parameters.")
         errors = tc.validate()
         if not errors:
             print("Configurations are valid.")
@@ -59,6 +61,7 @@ def mssql_validate(ansible: str, terraform: str, verbose: bool):
             print("Warning! The following issues were found:")
             for error in errors:
                 print(f"- {error}")
+
     except ValueError as e:
         print(f"Error: {e}")
         exit(1)
