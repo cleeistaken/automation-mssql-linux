@@ -28,7 +28,7 @@ def mssql_prompt(ansible: str, terraform: str, verbose: bool):
         if not errors:
             print("Configuration is valid.")
         else:
-            print("Warning! The following issues were found:")
+            print("\nWarning! The following issues were found:")
             for error in errors:
                 print(f"- {error}")
 
@@ -58,7 +58,7 @@ def mssql_validate(ansible: str, terraform: str, verbose: bool):
         if not errors:
             print("Configurations are valid.")
         else:
-            print("Warning! The following issues were found:")
+            print("\nWarning! The following issues were found:")
             for error in errors:
                 print(f"- {error}")
             exit(1)

@@ -12,14 +12,6 @@ ANSIBLE_MSSQL_HOME="$(realpath ~/settings-mssql.yml)"
 ANSIBLE_MSSQL_CONFIG="settings-mssql.yml"
 ANSIBLE_UBUNTU_20_04="settings-ubuntu-20.04.yml"
 
-pushd "lib/mssql-linux-config" > /dev/null
-pipenv run python main.py validate \
--t /opt/automation/automation-mssql-linux/config/terraform-mssql.tfvars \
--a /opt/automation/automation-mssql-linux/config/settings-mssql.yml \
--v
-echo $?
-popd > /dev/null
-
 # Configuration
 echo "Setting configurations"
 pushd "${DIR_CONFIG}" > /dev/null
@@ -43,6 +35,20 @@ pushd "${DIR_CONFIG}" > /dev/null
     echo "Using settings in the config folder"
     ln -f -s "${ANSIBLE_MSSQL_CONFIG}" "settings.yml"
   fi
+popd > /dev/null
+
+# Validation
+pushd "lib/mssql-linux-config" > /dev/null
+
+pipenv run python main.py validate \
+-t /opt/automation/automation-mssql-linux/config/terraform.tfvars \
+-a /opt/automation/automation-mssql-linux/config/settings.yml \
+-v
+
+ret=$?
+if [ $ret -ne 0 ]; then
+  exit $ret
+fi
 
 popd > /dev/null
 
