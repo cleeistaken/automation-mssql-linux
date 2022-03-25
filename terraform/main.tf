@@ -43,7 +43,6 @@ module "mssql-linux" {
   vsphere_compute_cluster = var.vsphere_compute_cluster
   vsphere_folder_vm = var.vsphere_folder_vm
   vsphere_resource_pool = var.vsphere_resource_pool
-  vsphere_distributed_switch = var.vsphere_distributed_switch
   vsphere_network_1_portgroup = var.vsphere_network_1_portgroup
   vsphere_network_1_ipv4_subnet_cidr = var.vsphere_network_1_ipv4_subnet_cidr
   vsphere_network_1_ipv4_ips = var.vsphere_network_1_ipv4_ips

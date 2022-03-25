@@ -16,11 +16,6 @@ variable "vsphere_resource_pool" {
   type = string
 }
 
-# Network 1 Distributed vSwitch
-variable "vsphere_distributed_switch" {
-  type = string
-}
-
 # Network 1 Distributed Portgroup
 variable "vsphere_network_1_portgroup" {
   type = string
