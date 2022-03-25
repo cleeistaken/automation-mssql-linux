@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+inquirer = "==2.8.0"
+pyvmomi = "*"
+validators = "*"
+jinja2 = "*"
+python-hcl2 = "*"
+pyyaml = "*"
+click = "*"
+
+[dev-packages]
+black = "*"
+
+[requires]
+python_version = "3.9"

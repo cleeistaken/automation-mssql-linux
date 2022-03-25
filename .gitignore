@@ -1,4 +1,7 @@
-#
+# OSX stuff
+.DS_Store
+
+# Specific data
 config/*.cer
 config/inventory.yml
 config/terraform.tfvars
