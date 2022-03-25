@@ -2,6 +2,7 @@ from ipaddress import IPv4Network, IPv4Address, IPv4Interface
 
 import inquirer
 
+from inquirer.themes import GreenPassion
 from pathlib import Path
 from typing import List
 
@@ -60,7 +61,7 @@ class MssqlLinux(ConfigBase):
                 default=False,
             ),
         ]
-        answers = inquirer.prompt(questions)
+        answers = inquirer.prompt(questions, theme=GreenPassion())
         self.terraform.vcenter_server = answers.get("vcenter").strip()
         self.terraform.vcenter_user = answers.get("username").strip()
         self.terraform.vcenter_password = answers.get("password").strip()
@@ -86,7 +87,7 @@ class MssqlLinux(ConfigBase):
                     choices=[x.name for x in vc_datacenters],
                 ),
             ]
-            answers = inquirer.prompt(questions)
+            answers = inquirer.prompt(questions, theme=GreenPassion())
             vc_datacenter = find_obj_name(
                 object_list=vc_datacenters, name=answers.get("vc_datacenter")
             )
@@ -100,7 +101,7 @@ class MssqlLinux(ConfigBase):
                     choices=[x.name for x in vc_datacenter.clusters],
                 ),
             ]
-            answers = inquirer.prompt(questions)
+            answers = inquirer.prompt(questions, theme=GreenPassion())
             vc_cluster = find_obj_name(
                 object_list=vc_datacenter.clusters,
                 name=answers.get("vc_cluster"),
@@ -115,7 +116,7 @@ class MssqlLinux(ConfigBase):
                     choices=[x.name for x in vc_cluster.datastores],
                 ),
             ]
-            answers = inquirer.prompt(questions)
+            answers = inquirer.prompt(questions, theme=GreenPassion())
             vc_datastore = find_obj_name(
                 object_list=vc_cluster.datastores, name=answers.get("vc_datastore")
             )
@@ -129,7 +130,7 @@ class MssqlLinux(ConfigBase):
                     choices=[x.name for x in vc_cluster.networks],
                 ),
             ]
-            answers = inquirer.prompt(questions)
+            answers = inquirer.prompt(questions, theme=GreenPassion())
             vc_network = find_obj_name(
                 object_list=vc_cluster.networks, name=answers.get("vc_network")
             )
@@ -148,7 +149,7 @@ class MssqlLinux(ConfigBase):
                     validate=validation_domain_list,
                 ),
             ]
-            answers = inquirer.prompt(questions)
+            answers = inquirer.prompt(questions, theme=GreenPassion())
             self.terraform.network_domain_name = answers.get(
                 "vc_network_domain"
             ).strip()
@@ -180,7 +181,7 @@ class MssqlLinux(ConfigBase):
                     validate=validation_ipv4_address_list,
                 ),
             ]
-            answers = inquirer.prompt(questions)
+            answers = inquirer.prompt(questions, theme=GreenPassion())
             self.terraform.vsphere_network_1_ipv4_subnet_cidr = IPv4Network(
                 answers.get("vc_network_ipv4_subnet_cidr").strip()
             )
@@ -227,7 +228,7 @@ class MssqlLinux(ConfigBase):
                     default=40,
                 ),
             ]
-            answers = inquirer.prompt(questions)
+            answers = inquirer.prompt(questions, theme=GreenPassion())
             self.terraform.vm_mssql_count = int(answers.get("vm_mssql_count"))
             self.terraform.vm_mssql_vcpu_count = int(answers.get("vm_mssql_vcpu_count"))
             self.terraform.vm_mssql_memory_gb = int(answers.get("vm_mssql_memory_gb"))
@@ -256,7 +257,7 @@ class MssqlLinux(ConfigBase):
                     default=False,
                 ),
             ]
-            answers = inquirer.prompt(questions)
+            answers = inquirer.prompt(questions, theme=GreenPassion())
             vip_cidr = IPv4Interface(
                 f"{answers.get('mssql_ipv4_vip').strip()}/{self.terraform.vsphere_network_1_ipv4_subnet_cidr.prefixlen}"
             )
