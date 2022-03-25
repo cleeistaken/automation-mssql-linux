@@ -61,6 +61,7 @@ def mssql_validate(ansible: str, terraform: str, verbose: bool):
             print("Warning! The following issues were found:")
             for error in errors:
                 print(f"- {error}")
+            exit(1)
 
     except ValueError as e:
         print(f"Error: {e}")
