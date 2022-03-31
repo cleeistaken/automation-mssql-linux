@@ -36,10 +36,6 @@ vsphere_folder_vm = "mssql"
 # This resource must not exist and will be created by Terraform. <---
 vsphere_resource_pool = "mssql"
 
-# vSphere Distributed Switch with the target portgroup.
-# This resource must exist.
-vsphere_distributed_switch = "DSwitch"
-
 # vSphere Distributed Switch PortGroup.
 # This resource must exist.
 vsphere_network_1_portgroup = "DPortGroup"
