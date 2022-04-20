@@ -43,8 +43,8 @@ The recommended method of running this code is using our preconfigured ova templ
 ### Appliance
 1. Download the .OVA template.
 
-   https://storage.googleapis.com/workload-automation/templates/testbench-1.2.1.ova
-   https://storage.googleapis.com/workload-automation/templates/testbench-1.3.0rc1.ova
+   * https://storage.googleapis.com/workload-automation/templates/testbench-1.2.1.ova
+   * https://storage.googleapis.com/workload-automation/templates/testbench-1.3.0rc1.ova
 
 
 2. Deploy the template. During the deployment configure the following:
