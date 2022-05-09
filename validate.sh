@@ -35,6 +35,20 @@ pushd "${DIR_CONFIG}" > /dev/null
     echo "Using settings in the config folder"
     ln -f -s "${ANSIBLE_MSSQL_CONFIG}" "settings.yml"
   fi
+popd > /dev/null
+
+# Validation
+pushd "lib/mssql-linux-config" > /dev/null
+
+pipenv run python main.py validate \
+-t /opt/automation/automation-mssql-linux/config/terraform.tfvars \
+-a /opt/automation/automation-mssql-linux/config/settings.yml \
+-v
+
+ret=$?
+if [ $ret -ne 0 ]; then
+  exit $ret
+fi
 
 popd > /dev/null
 

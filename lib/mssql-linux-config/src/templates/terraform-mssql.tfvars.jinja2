@@ -6,27 +6,27 @@
 # vCenter Server Configuration
 #
 # vCenter Hostname or IP
-vcenter_server = "vc.vmware.home"
+vcenter_server = "{{ vcenter_server }}"
 
 # Username
-vcenter_user = "administrator@vsphere.local"
+vcenter_user = "{{ vcenter_user }}"
 
 # Password
-vcenter_password = "VMware1!"
+vcenter_password = "{{ vcenter_password }}"
 
 # Allow unverified SSL connection
-vcenter_insecure_ssl = true
+vcenter_insecure_ssl = {{ 'true' if vcenter_insecure_ssl else 'false' }}
 
 #
 # vSphere Configuration
 #
 # vSphere Datacenter.
 # This resource must exist.
-vsphere_datacenter = "Datacenter"
+vsphere_datacenter = "{{ vsphere_datacenter }}"
 
 # vSphere Cluster in the Datacenter.
 # This resource must exist.
-vsphere_compute_cluster = "Cluster"
+vsphere_compute_cluster = "{{ vsphere_compute_cluster }}"
 
 # vSphere VM Folder containing the created VM.
 # This resource must not exist and will be created by Terraform. <---
@@ -38,35 +38,35 @@ vsphere_resource_pool = "mssql"
 
 # vSphere Distributed Switch PortGroup.
 # This resource must exist.
-vsphere_network_1_portgroup = "DPortGroup"
+vsphere_network_1_portgroup = "{{ vsphere_network_1_portgroup }}"
 
 # Subnet for the PortGroup.
-# This must be configured in CIDR format "<network>/<mask>" (e.g. "10.0.0.0/8")
-vsphere_network_1_ipv4_subnet_cidr = "10.0.0.0/8"
+# This must be configured in CIDR format "network/mask" (e.g. "10.0.0.0/8")
+vsphere_network_1_ipv4_subnet_cidr = "{{ vsphere_network_1_ipv4_subnet_cidr }}"
 
 # List of IP addresses that will be used for the created VM.
 # There must be as many IP as the requested number of MSSQL VM nodes (see 'vm_mssql_count').
 # The IP addresses must not be in use.
-vsphere_network_1_ipv4_ips = ["10.0.1.1", "10.0.1.2", "10.0.1.3", "10.0.1.4", "10.0.1.5"]
+vsphere_network_1_ipv4_ips = [{{ '\"' + vsphere_network_1_ipv4_ips|join('\", \"') + '\"' }}]
 
 # Address of the gateway for the PortGroup subnet.
-vsphere_network_1_ipv4_gateway = "10.0.0.1"
+vsphere_network_1_ipv4_gateway = "{{ vsphere_network_1_ipv4_gateway }}"
 
 # The target Datastore for the created VM.
 # This resource must exist and have sufficient available capacity.
-vsphere_datastore = "vsanDatastore"
+vsphere_datastore = "{{ vsphere_datastore }}"
 
 #
 # Network
 #
 # Domain that will be appended to the hostname
-network_domain_name = "vmware.home"
+network_domain_name = "{{ network_domain_name }}"
 
 # DNS servers that will be configured on the created VM
-network_ipv4_dns_servers = ["8.8.8.8", "8.8.4.4"]
+network_ipv4_dns_servers = [{{ '\"' + network_ipv4_dns_servers|join('\", \"') + '\"' }}]
 
 # DNS suffix search list
-network_dns_suffix = []
+network_dns_suffix = [{{ '\"' + network_dns_suffix|join('\", \"') + '\"' }}]
 
 #
 # VM MSSQL
@@ -77,13 +77,13 @@ vm_mssql_prefix = "mssql-linux"
 # The number of MSSQL VM to create.
 # Currently this project only support nodes counts of 3 or 5. The SQL Server Linux AG
 # replica are configured with the synchronized commit option.
-vm_mssql_count = 3
+vm_mssql_count = {{ vm_mssql_count }}
 
 # The VM hardware configuration
 vm_mssql = {
-    cpu = 8            # Number of vCPU
-    memory_gb = 32     # Amount of RAM in GB
+    cpu = {{ vm_mssql_vcpu_count }}            # Number of vCPU
+    memory_gb = {{ vm_mssql_memory_gb }}     # Amount of RAM in GB
     os_disk_gb = 60    # Size of the OS disk
-    data_disk_gb = 100 # Size of the disk where the MSSQL data will reside
-    log_disk_gb  = 40  # Size of the disk where the MSSQL log will reside
+    data_disk_gb = {{ vm_mssql_data_disk_gb }} # Size of the disk where the MSSQL data will reside
+    log_disk_gb  = {{ vm_mssql_log_disk_gb }}  # Size of the disk where the MSSQL log will reside
 }

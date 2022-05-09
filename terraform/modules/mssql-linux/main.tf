@@ -26,15 +26,9 @@ data "vsphere_datastore" "vsphere_datastore_1" {
   datacenter_id = data.vsphere_datacenter.vsphere_datacenter_1.id
 }
 
-data "vsphere_distributed_virtual_switch" "vsphere_distributed_virtual_switch_1" {
-  name          = var.vsphere_distributed_switch
-  datacenter_id = data.vsphere_datacenter.vsphere_datacenter_1.id
-}
-
 data "vsphere_network" "vsphere_network_1" {
   name                            = var.vsphere_network_1_portgroup
   datacenter_id                   = data.vsphere_datacenter.vsphere_datacenter_1.id
-  distributed_virtual_switch_uuid = data.vsphere_distributed_virtual_switch.vsphere_distributed_virtual_switch_1.id
 }
 
 locals {

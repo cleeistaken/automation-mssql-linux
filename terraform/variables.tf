@@ -78,13 +78,6 @@ variable "vsphere_resource_pool" {
   default     = "New Resource Pool"
 }
 
-# Network 1 Distributed vSwitch
-variable "vsphere_distributed_switch" {
-  description = "vSphere Distributed Switch (This resource must exist)"
-  type        = string
-  default     = "DSwitch"
-}
-
 # Network 1 Distributed Portgroup
 variable "vsphere_network_1_portgroup" {
   description = "vSphere Distributed Switch Portgroup 1 (This resource must exist)"
