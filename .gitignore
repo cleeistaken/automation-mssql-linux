@@ -1,4 +1,7 @@
-#
+# OSX stuff
+.DS_Store
+
+# Specific data
 config/*.cer
 config/inventory.yml
 config/terraform.tfvars
@@ -12,6 +15,9 @@ terraform/tfplan
 
 # Local .terraform directories
 **/.terraform/*
+
+# Terraform
+.terraform.lock.hcl
 
 # .tfstate files
 *.tfstate
