@@ -111,7 +111,7 @@ resource "vsphere_virtual_machine" "mssql_linux_vm" {
 
 # Anti-affinity rule
 resource "vsphere_compute_cluster_vm_anti_affinity_rule" "mssql_anti_affinity_rule" {
-  count               = var.vm_mssql_count > 0 ? 1 : 0
+  count               = (var.vm_mssql_anti_affinity && var.vm_mssql_count > 0) ? 1 : 0
   name                = format("%s-anti-affinity-rule", var.vm_mssql_prefix)
   compute_cluster_id  = data.vsphere_compute_cluster.vsphere_compute_cluster_1.id
   virtual_machine_ids = vsphere_virtual_machine.mssql_linux_vm.*.id

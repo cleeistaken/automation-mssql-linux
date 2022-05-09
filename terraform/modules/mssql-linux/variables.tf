@@ -99,3 +99,8 @@ variable "vm_mssql" {
     log_disk_gb  = number
   })
 }
+
+variable "vm_mssql_anti_affinity" {
+  type = bool
+  default = true
+}

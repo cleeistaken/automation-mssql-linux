@@ -62,4 +62,5 @@ module "mssql-linux" {
   vm_mssql_prefix = var.vm_mssql_prefix
   vm_mssql_count = var.vm_mssql_count
   vm_mssql = var.vm_mssql
+  vm_mssql_anti_affinity = var.vm_mssql_anti_affinity
 }
