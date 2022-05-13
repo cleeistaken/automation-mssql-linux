@@ -42,9 +42,7 @@ The recommended method of running this code is using our preconfigured ova templ
 
 ### Appliance
 1. Download the .OVA template.
-
-   * https://storage.googleapis.com/workload-automation/templates/testbench-1.2.1.ova
-   * https://storage.googleapis.com/workload-automation/templates/testbench-1.3.0rc1.ova
+   * https://storage.googleapis.com/workload-automation/templates/controlvm-1.5.ova
 
 
 2. Deploy the template. During the deployment configure the following:
@@ -52,6 +50,7 @@ The recommended method of running this code is using our preconfigured ova templ
    * DHCP or Static network configuration
    * IPv4 parameters (if Static network configuration)
 
+### CLI
 ### Configure
 1. Login as ***root***
 
@@ -99,7 +98,19 @@ The recommended method of running this code is using our preconfigured ova templ
     cd /opt/automation/automation-mssql-linux/
     ./destroy.sh
     ```   
-
+### GUI
+1. Once the ova is deployed, point to the web GUI portal: http://<testbench-ip-addr>:8000
+2. Fill in the configuration page with the necessary information. The information icon provides more details of each entry.
+   * vSphere Environment Configuration - used to customize the vSphere infra information, i.e vCenter IP, credential, datacenter, cluster, datastore, port group, etc.
+   * Network Configuration - used to customize the network settings used my the clustered SQL Server, i.e. IP pools for clustered MSSQL VMs, Domain name, DNS settings, etc.
+   * VM configuration - used to customize the virtual machine configuration, i.e. number of VMs in an AG cluster, disk size of each VM, etc
+   * SQL Server configuration - used to customize SQL Server edition, PCS cluster CIDR, etc
+   * Advanced configuration - used to customize all the parameters defined in our automation package. i.e. MSSQL AG name, database name, etc.
+3. Use the following buttons
+   * Save Config: Click this button to save your configuration parameters once you complete the configuration page,
+   * Validate Config: Click this button to validate the configuration parameters. The validation process will make sure your inputs are ready for the deployment.
+   * Start Deployment: This button is only available after you pass the validation: Click this button to start clustered MSSQL deployment. The process may take a few minutes depending on the deployment scale and network situation.
+   * Destroy Guest VMs: Click this button if you want to destroy the MSSQL cluster.
 
 ## Known Issues / Limitations
 * Terraform resource pool creation will fail if VMware Distributed Resource Scheduler DRS is not enabled on the cluster. 
@@ -169,3 +180,7 @@ The recommended method of running this code is using our preconfigured ova templ
 ### 1.3.0RC1
 * Improved the validation script
 * Added an HTTP GUI
+
+### 1.5
+* Rename appliance from Testbench to ControlVM
+* Added 'Deployment Model' option for On-Premises or VMware Cloud
